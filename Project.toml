@@ -1,0 +1,25 @@
+name = "DistributedOptimization"
+uuid = "bad89516-e02f-43f9-a1d3-8f2ce98dd1a2"
+authors = ["Rico Schrage, OFFIS e.V."]
+repo = "https://github.com/OFFIS-DAI/DistributedOptimization.jl"
+version = "0.1.0"
+
+[deps]
+AutoHashEquals = "15f4f7f2-30c1-5605-9d31-71845cf9641f"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Mango = "5e49fdec-d473-4d14-b295-7bff2fcf1925"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+
+[compat]
+AutoHashEquals = "2.2.0"
+Distributions = "0.25.115"
+Mango = "^0.4"
+Revise = "3.6.4"
+julia = "^1.9"
+
+[extras]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "Documenter"]
