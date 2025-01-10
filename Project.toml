@@ -1,7 +1,7 @@
 name = "DistributedOptimization"
 uuid = "bad89516-e02f-43f9-a1d3-8f2ce98dd1a2"
 authors = ["Rico Schrage"]
-repo = "https://github.com/OFFIS-DAI/DistributedOptimization.jl"
+repo = "https://github.com/Digitalized-Energy-Systems/DistributedOptimization.jl"
 version = "0.1.0"
 
 [deps]
