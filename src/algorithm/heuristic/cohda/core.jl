@@ -268,7 +268,7 @@ function process_exchange_message(algorithm_data::COHDAAlgorithmData, messages::
         # something changed in perceive so we do decide and act
         sysconf, candidate = decide(algorithm_data, algorithm_data.decider, sysconf, candidate)
         # act
-        for other in others(carrier)
+        for other in others(carrier, "$(algorithm_data.participant_id)")
             wm = act(algorithm_data, sysconf, candidate)
             send(carrier, wm, other)
         end

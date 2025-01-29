@@ -23,4 +23,5 @@ end
 @testset "Distributed Optimization Tests" begin
     include("cohda_tests.jl")
     include("cohda_local_search_tests.jl")
+    include("cohda_mango_tests.jl")
 end

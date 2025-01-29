@@ -1,13 +1,13 @@
-export Carrier, send, schedule, others
+export Carrier, send_using, schedule_using, others
 
 abstract type Carrier end
 
-function send(carrier::Carrier, content_data::Any, receiver::Any)
+function send_using(carrier::Carrier, content_data::Any, receiver::Any)
     throw("NotImplemented")
 end
-function schedule(to_be_scheduled::Function, carrier::Carrier, delay_s::Float64)
+function schedule_using(to_be_scheduled::Function, carrier::Carrier, delay_s::Float64)
     throw("NotImplemented")
 end
-function others(carrier::Carrier)
+function others(carrier::Carrier, participant_id::String)
     throw("NotImplemented")
 end
