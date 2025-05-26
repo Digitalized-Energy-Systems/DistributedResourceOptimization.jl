@@ -275,7 +275,7 @@ function process_exchange_message(algorithm_data::COHDAAlgorithmData, messages::
     end
 end
 
-function on_exchange_message(algorithm_data::COHDAAlgorithmData, message::WorkingMemory, carrier::Carrier)
+function on_exchange_message(algorithm_data::COHDAAlgorithmData, carrier::Carrier, message::WorkingMemory, meta::Any)
     process_exchange_message(algorithm_data, [message], carrier)
     return true
 end

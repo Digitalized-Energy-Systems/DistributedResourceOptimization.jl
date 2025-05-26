@@ -24,4 +24,5 @@ end
     include("cohda_tests.jl")
     include("cohda_local_search_tests.jl")
     include("cohda_mango_tests.jl")
+    include("flex_admm_tests.jl")
 end

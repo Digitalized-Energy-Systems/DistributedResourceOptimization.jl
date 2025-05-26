@@ -118,14 +118,14 @@ end
     cohda_part_2 = create_cohda_participant(2, [[0.0, 1, 2], [1, 2.0, 3], [1, 1, 1], [4, 2, 3]])
     init_wm = create_cohda_start_message([1, 2.0, 1])
 
-    on_exchange_message(cohda_part_1, init_wm, test_carrier)
+    on_exchange_message(cohda_part_1, test_carrier, init_wm, nothing)
     wm_to_send = test_carrier.test_neighbor_messages[1][end]
 
     @test wm_to_send.solution_candidate.schedules == [1 1 1]
 
-    wm_to_send = on_exchange_message(cohda_part_2, wm_to_send, test_carrier)
+    wm_to_send = on_exchange_message(cohda_part_2, test_carrier, wm_to_send, nothing)
     wm_to_send = test_carrier.test_neighbor_messages[1][end]
-    wm_to_send = on_exchange_message(cohda_part_1, wm_to_send, test_carrier)
+    wm_to_send = on_exchange_message(cohda_part_1, test_carrier, wm_to_send, nothing)
     wm_to_send = test_carrier.test_neighbor_messages[1][end]
 
     @test cohda_part_1.participant_id == 1
@@ -140,7 +140,7 @@ end
 
     @test wm_to_send.solution_candidate.schedules == [1 1 0; 0 1 2]
 
-    wm_to_send = on_exchange_message(cohda_part_2, wm_to_send, test_carrier)
+    wm_to_send = on_exchange_message(cohda_part_2, test_carrier, wm_to_send, nothing)
     wm_to_send = test_carrier.test_neighbor_messages[1][end]
 
     @test !isnothing(wm_to_send)
@@ -148,7 +148,7 @@ end
     @test cohda_part_2.memory.solution_candidate.schedules == [1 1 0; 0 1 2]
 
     len_before = length(test_carrier.test_neighbor_messages[1])
-    wm_to_send = on_exchange_message(cohda_part_1, wm_to_send, test_carrier)
+    wm_to_send = on_exchange_message(cohda_part_1, test_carrier, wm_to_send, nothing)
     wm_to_send = test_carrier.test_neighbor_messages[1][end]
 
     @test len_before == length(test_carrier.test_neighbor_messages[1])
@@ -238,7 +238,7 @@ S_HINRICHS_CASE = [
     while last_length == -1 || last_length < length(test_carrier.test_neighbor_messages[1])
         for cohda_part in cohda_parts
             last_length = last_length != -1 ? length(test_carrier.test_neighbor_messages[1]) : 0
-            wm_to_send = on_exchange_message(cohda_part, wm_to_send, test_carrier)
+            wm_to_send = on_exchange_message(cohda_part, test_carrier, wm_to_send, nothing)
             wm_to_send = test_carrier.test_neighbor_messages[1][end]
             if last_length == length(test_carrier.test_neighbor_messages[1])
                 break
