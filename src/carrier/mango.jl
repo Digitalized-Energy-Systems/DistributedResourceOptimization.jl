@@ -7,7 +7,9 @@ struct MangoCarrier <: Carrier
     include_self::Bool
 end
 
-struct StartCoordinatedDistributedOptimization end
+struct StartCoordinatedDistributedOptimization 
+    input::Any
+end
 struct OptimizationFinishedMessage 
     result::Any
 end
@@ -27,7 +29,7 @@ end
 
 function Mango.handle_message(role::CoordinatorRole, message::StartCoordinatedDistributedOptimization, meta::Any)
     role.task = schedule(role, InstantTaskData()) do
-        x = start_optimization(role.coordinator, role.carrier, message, meta)
+        x = start_optimization(role.coordinator, role.carrier, message.input, meta)
 
         for (i, addr) in enumerate(others(role.carrier, "participant"))
             send_message(role, OptimizationFinishedMessage(x[i]), addr)

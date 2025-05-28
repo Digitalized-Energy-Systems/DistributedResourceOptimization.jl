@@ -36,14 +36,14 @@ function _create_C_and_d(u::Vector{<:Real})
     d[1] = sum(u)
 
     for j in 1:(m-1)
-      r1 = 1 + 2*(j-1) + 1
-      r2 = r1 + 1
+        r1 = 1 + 2*(j-1) + 1
+        r2 = r1 + 1
 
-      C[r1, j] =  1/u[j]
-      C[r1, m] = -1/u[m]
+        C[r1, j] =  1/u[j]
+        C[r1, m] = -1/u[m]
 
-      C[r2, j] = -1/u[j]
-      C[r2, m] =  1/u[m]
+        C[r2, j] = -1/u[j]
+        C[r2, m] =  1/u[m]
     end
 
     return C, d
@@ -88,7 +88,6 @@ function on_exchange_message(actor::ADMMFlexActor, carrier::Carrier, message_dat
 end
 
 @kwdef struct ADMMFlexCoordinator <: Coordinator
-    T::Vector{Float64}
     ρ::Float64 = 1.0 
     max_iters::Int64 = 100
     slack_penalty::Int64 = 100
@@ -97,8 +96,7 @@ end
 end
 
 # ADMM solver
-function _admm_flex(admm::ADMMFlexCoordinator, carrier::Carrier)
-    T = admm.T
+function _admm_flex(admm::ADMMFlexCoordinator, carrier::Carrier, T::Vector{Float64})
     ρ = admm.ρ
     max_iters = admm.max_iters
     slack_penalty = admm.slack_penalty
@@ -152,12 +150,13 @@ function _admm_flex(admm::ADMMFlexCoordinator, carrier::Carrier)
         end
         if k == max_iters
             @warn "Reached max iterations ($max_iters) without full convergence."
+            throw("ADMM not converged $x, $u")
         end
     end
     return x, z, u
 end
 
-function start_optimization(coordinator::ADMMFlexCoordinator, carrier::Carrier, message_data::Any, meta::Any)
-    x,_,_ = _admm_flex(coordinator, carrier)
+function start_optimization(coordinator::ADMMFlexCoordinator, carrier::Carrier, target::Vector{Float64}, meta::Any)
+    x,_,_ = _admm_flex(coordinator, carrier, target)
     return x
 end
