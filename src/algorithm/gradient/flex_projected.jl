@@ -1,5 +1,3 @@
-using Distributed
-using LinearAlgebra
 using JuMP
 using OSQP
 

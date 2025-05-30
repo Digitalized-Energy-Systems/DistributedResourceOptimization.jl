@@ -1,7 +1,5 @@
 export ADMMFlexAnswer, ADMMFlexMessage, ADMMFlexActor, ADMMFlexCoordinator, create_admm_flex_actor_one_to_many, result
 
-using Distributed
-using LinearAlgebra
 using JuMP
 using OSQP
 
