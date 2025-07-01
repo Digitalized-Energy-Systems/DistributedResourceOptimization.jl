@@ -10,6 +10,7 @@ end
 struct StartCoordinatedDistributedOptimization 
     input::Any
 end
+
 struct OptimizationFinishedMessage 
     result::Any
 end
@@ -50,7 +51,9 @@ function DistributedOptimizationRole(algorithm::DistributedAlgorithm; tid::Symbo
 end
 
 function Mango.handle_message(role::DistributedOptimizationRole, message::Any, meta::Any)
-    on_exchange_message(role.algorithm, role.carrier, message, meta)
+    if haskey(meta, "optimization_message") && meta["optimization_message"]
+        on_exchange_message(role.algorithm, role.carrier, message, meta)
+    end
 end
 
 function Base.wait(carrier::MangoCarrier, waitable::Any)
@@ -58,7 +61,7 @@ function Base.wait(carrier::MangoCarrier, waitable::Any)
 end
 
 function send_to_other(carrier::MangoCarrier, content::Any, receiver::AgentAddress)
-    return send_message(carrier.parent, content, receiver)
+    return send_message(carrier.parent, content, receiver, optimization_message=true)
 end
 
 mutable struct EventWithValue
@@ -71,15 +74,19 @@ function Base.wait(event::EventWithValue)
     return event.value
 end
 
+function Base.wait(carrier::MangoCarrier, event::EventWithValue)
+    wait(carrier.parent.context.agent.scheduler, event.event)
+    return event.value
+end
+
 function send_awaitable(carrier::MangoCarrier, content::Any, receiver::AgentAddress)
     event = EventWithValue(Base.Event(), nothing)
-    send_and_handle_answer(carrier.parent, content, receiver) do _, answer,_
+    send_and_handle_answer(carrier.parent, content, receiver, optimization_message=true) do _, answer,_
         event.value = answer
-        notify(event.event)
+        notify(carrier.parent.context.agent.scheduler, event.event)
     end
     return event
 end
-
 
 function reply_to_other(carrier::MangoCarrier, content_data::Any, meta::Any)
     reply_to(carrier.parent, content_data, meta)
@@ -88,7 +95,7 @@ end
 function send_and_wait_for_answers(carrier::MangoCarrier, content_data::Any, receivers::Vector{AgentAddress})
     role = carrier.parent
     event = EventWithValue(Base.Event(), nothing)
-    send_and_handle_answers(role, content_data, receivers) do _, answers, _
+    send_and_handle_answers(role, content_data, receivers, optimization_message=true) do _, answers, _
         event.value = answers
         notify(event.event)
     end

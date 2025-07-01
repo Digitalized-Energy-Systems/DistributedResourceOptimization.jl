@@ -3,13 +3,13 @@ export DistributedAlgorithm, on_exchange_message, CoordinatedDistributedAlgorith
 abstract type DistributedAlgorithm end
 
 function on_exchange_message(algorithm::DistributedAlgorithm, carrier::Carrier, message_data::Any, meta::Any)
-    return false
+    throw("NotImplementedOrWrongArgumentTypes")
 end
 
 abstract type Coordinator end
 
 function start_optimization(coordinator::Coordinator, carrier::Carrier, message_data::Any, meta::Any)
-    return false
+    throw("NotImplementedOrWrongArgumentTypes")
 end
 
 struct CoordinatedDistributedAlgorithm 
