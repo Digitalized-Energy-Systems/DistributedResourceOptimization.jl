@@ -11,7 +11,7 @@ using DistributedOptimization
 
     initial_message = create_cohda_start_message([1.2, 2, 3])
 
-    auto_assign!(complete_topology(), container)
+    auto_assign!(complete_topology(2), container)
 
     activate(container) do
         send_message(agent_one, initial_message, address(agent_two))
