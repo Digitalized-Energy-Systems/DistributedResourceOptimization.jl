@@ -1,8 +1,12 @@
-export ADMMStart, ADMMAnswer, ADMMAnswer, ADMMGlobalActor, ADMMGlobalObjective, ADMMGenericCoordinator
+export ADMMStart, ADMMAnswer, ADMMAnswer, ADMMGlobalActor, ADMMGlobalObjective, ADMMGenericCoordinator, create_admm_start
 
 struct ADMMStart
     data::Any
     solution_length::Int
+end
+
+function create_admm_start(data::Any, length::Int)
+    return ADMMStart(data, length)
 end
 
 struct ADMMMessage 
@@ -49,7 +53,7 @@ end
 @kwdef struct ADMMGenericCoordinator <: Coordinator
     global_actor::ADMMGlobalActor
     ρ::Float64 = 1.0 
-    max_iters::Int64 = 100
+    max_iters::Int64 = 1000
     slack_penalty::Int64 = 100
     abs_tol::Float64 = 1e-4
     rel_tol::Float64 = 1e-3
@@ -105,11 +109,11 @@ function _start_coordinator(admm::ADMMGenericCoordinator, carrier::Carrier, inpu
         
         # Varying penalty paramter according to B. S. He, H. Yang, and S. L. Wang, “Alternating direction method with self
         # adaptive penalty parameters for monotone variational inequalities,”
-        if r_norm > μ * s_norm
-            ρ = ρ * τ
-        elseif s_norm > μ * r_norm
-            ρ = ρ / τ
-        end
+        # if r_norm > μ * s_norm
+        #     ρ = ρ * τ
+        # elseif s_norm > μ * r_norm
+        #     ρ = ρ / τ
+        # end
         
         if k == max_iters
             @warn "Reached max iterations ($max_iters) without full convergence."

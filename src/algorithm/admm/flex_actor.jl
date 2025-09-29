@@ -9,13 +9,13 @@ mutable struct ADMMFlexActor <: DistributedAlgorithm
     u::Vector{Float64} # upper bounds
     C::Matrix{Float64} # coupling matrix
     d::Vector{Float64} # coupling RHS
-    S::Vector{Float64} # prio penalty per sector
+    S::Vector{<:Real} # prio penalty per sector
     x::Vector{Float64} # intermediate result/result
     ADMMFlexActor(l::Vector{Float64},
         u::Vector{Float64},
         C::Matrix{Float64},
         d::Vector{Float64},
-        S::Vector{Float64}) = new(l, u, C, d, S, Vector{Float64}())
+        S::Vector{<:Real}) = new(l, u, C, d, S, Vector{Float64}())
 end
 
 function _create_C_and_d(u::Vector{<:Real})
@@ -44,17 +44,18 @@ function _create_C_and_d(u::Vector{<:Real})
     return C, d
 end
 
-function create_admm_flex_actor_one_to_many(in_capacity::Real, η::Vector{Float64}, S::Union{Nothing,Vector{<:Real}}=nothing)
+function create_admm_flex_actor_one_to_many(in_capacity::Real, η::Vector{Float64}, P::Union{Nothing,Vector{<:Real}}=nothing)
     tech_capacity = in_capacity .* η
 
-    if isnothing(S)
-        S = zeros(length(η))
+    if isnothing(P)
+        P = zeros(length(η))
     end
     l = min.(zeros(length(tech_capacity)), tech_capacity)
     u = max.(tech_capacity, zeros(length(tech_capacity)))
     C, d = _create_C_and_d(tech_capacity)
 
-    return ADMMFlexActor(l, u, C, d, S)
+    # negative P to convert from penalty to reward
+    return ADMMFlexActor(l, u, C, d, -P)
 end
 
 function result(actor::ADMMFlexActor)

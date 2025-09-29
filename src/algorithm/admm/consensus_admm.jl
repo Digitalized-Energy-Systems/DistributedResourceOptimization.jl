@@ -1,4 +1,4 @@
-export create_consensus_target_reach_admm_coordinator, ADMMConsensusGlobalActor, create_admm_start_with_target
+export create_consensus_target_reach_admm_coordinator, ADMMConsensusGlobalActor
 
 
 @kwdef struct ADMMConsensusGlobalActor <: ADMMGlobalActor
@@ -40,8 +40,4 @@ end
 
 function create_consensus_target_reach_admm_coordinator()
     return ADMMGenericCoordinator(global_actor=ADMMConsensusGlobalActor())
-end
-
-function create_admm_start_with_target(target::Vector{<:Real})
-    return ADMMStart(target, length(target))
 end
