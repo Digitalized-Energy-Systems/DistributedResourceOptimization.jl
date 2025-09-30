@@ -1,4 +1,4 @@
-export create_consensus_target_reach_admm_coordinator, ADMMConsensusGlobalActor
+export create_consensus_target_reach_admm_coordinator, ADMMConsensusGlobalActor, create_admm_start_consensus
 
 
 @kwdef struct ADMMConsensusGlobalActor <: ADMMGlobalActor
@@ -6,7 +6,7 @@ export create_consensus_target_reach_admm_coordinator, ADMMConsensusGlobalActor
 end
 
 function z_update(actor::ADMMConsensusGlobalActor, input::Vector{<:Real}, x, u, z, ρ, N)
-    m = length(z)
+    m = length(z[1])
     S = zeros(m)
     for i in 1:N
         S .+= x[i] .+ u[i]
@@ -40,4 +40,8 @@ end
 
 function create_consensus_target_reach_admm_coordinator()
     return ADMMGenericCoordinator(global_actor=ADMMConsensusGlobalActor())
+end
+
+function create_admm_start_consensus(target::Vector{<:Real})
+    return ADMMStart(target, length(target))
 end

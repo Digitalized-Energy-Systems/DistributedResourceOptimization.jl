@@ -37,7 +37,7 @@ end
     auto_assign!(complete_topology(3), container)
 
     activate(container) do
-        send_message(container, StartCoordinatedDistributedOptimization(create_admm_start_with_target([1.0, 1.0])), address(ca))
+        send_message(container, StartCoordinatedDistributedOptimization(create_admm_start_consensus([1.0, 1.0])), address(ca))
     end
 
     @test isapprox(flex_actor.x, [1.1538631043061336, 0.7692460141088975], atol=1e-3)
@@ -62,11 +62,11 @@ end
     auto_assign!(complete_topology(3, tid=:custom), container)
 
     activate(container) do
-        send_message(container, StartCoordinatedDistributedOptimization(create_admm_start_with_target([1.0, 2.0])), address(ca))
+        send_message(container, StartCoordinatedDistributedOptimization(create_admm_start_consensus([1.0, 2.0])), address(ca))
     end
 
-    @test isapprox(flex_actor.x, [0.807, 0.538], rtol=1e-2)
-    @test isapprox(flex_actor2.x, [0.807, 0.538], rtol=1e-2)
+    @test isapprox(flex_actor.x, [0.8163816641254231, 0.5442936838263125], rtol=1e-2)
+    @test isapprox(flex_actor2.x, [0.8163816641254231, 0.5442936838263125], rtol=1e-2)
 end
 
 @testset "TestFlexADMMAWithMangoCarrierConvCreateCoordAsActor" begin
@@ -93,13 +93,13 @@ end
     auto_assign!(complete_topology(3, tid=:custom), container)
 
     activate(container) do
-        wait(send_message(c, StartCoordinatedDistributedOptimization(create_admm_start_with_target([1.0, 2.0])), address(ca)))
+        wait(send_message(ca, StartCoordinatedDistributedOptimization(create_admm_start_consensus([1.0, 2.0])), address(ca)))
         wait(coord_role.task)
     end
 
-    @test isapprox(flex_actor.x, [0.538, 0.359], rtol=1e-2)
-    @test isapprox(flex_actor2.x, [0.538, 0.359], rtol=1e-2)
-    @test isapprox(flex_actor3.x, [0.538, 0.359], rtol=1e-2)
+    @test isapprox(flex_actor.x, [0.545531954256762, 0.3637335132272603], rtol=1e-2)
+    @test isapprox(flex_actor2.x, [0.545531954256762, 0.3637335132272603], rtol=1e-2)
+    @test isapprox(flex_actor3.x, [0.545531954256762, 0.3637335132272603], rtol=1e-2)
     @test handle.got_it
     @test handle2.got_it
     @test handle3.got_it
@@ -149,7 +149,7 @@ end
     auto_assign!(complete_topology(4, tid=:custom), container)
 
     activate(container) do
-        wait(send_message(c, StartCoordinatedDistributedOptimization(create_admm_start_with_target([22.559000761215636, -0.0, 22.559000761215636])), address(ca)))
+        wait(send_message(c, StartCoordinatedDistributedOptimization(create_admm_start_consensus([22.559000761215636, -0.0, 22.559000761215636])), address(ca)))
         wait(coord_role.task)
     end
 
@@ -167,7 +167,7 @@ end
     flex_actor = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
     flex_actor2 = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
     flex_actor3 = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
-    coordinator = ADMMFlexCoordinator()
+    coordinator = create_consensus_target_reach_admm_coordinator()
 
     dor = DistributedOptimizationRole(flex_actor, tid=:custom)
     dor2 = DistributedOptimizationRole(flex_actor2, tid=:custom)
@@ -185,7 +185,7 @@ end
     auto_assign!(complete_topology(3, tid=:custom), container)
 
     activate(container) do
-        wait(send_message(c, StartCoordinatedDistributedOptimization(create_admm_start_with_target([2.0, 2.0, 3.0])), address(ca)))
+        wait(send_message(c, StartCoordinatedDistributedOptimization(create_admm_start_consensus([2.0, 2.0, 3.0])), address(ca)))
         wait(coord_role.task)
     end
 

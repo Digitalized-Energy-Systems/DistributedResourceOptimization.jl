@@ -16,7 +16,7 @@ function DistributedResourceOptimization.schedule(to_be_scheduled::Function, car
     to_be_scheduled()
 end
 
-function DistributedResourceOptimization.others(carrier::TestCarrier)
+function DistributedResourceOptimization.others(carrier::TestCarrier, participant_id::String)
     return carrier.test_neighbors
 end
 
