@@ -1,5 +1,5 @@
 
-module DistributedOptimization
+module DistributedResourceOptimization
 
 include("carrier/core.jl")
 include("algorithm/core.jl")
