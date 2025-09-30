@@ -1,4 +1,4 @@
-name: Test DistributedOptimization.jl
+name: Test DistributedResourceOptimization.jl
 
 on: 
   push:
@@ -37,7 +37,7 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: Digitalized-Energy-Systems/DistributedOptimization.jl
+          slug: Digitalized-Energy-Systems/DistributedResourceOptimization.jl
           fail_ci_if_error: false
 
   test_linux:
@@ -61,5 +61,5 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: Digitalized-Energy-Systems/DistributedOptimization.jl
+          slug: Digitalized-Energy-Systems/DistributedResourceOptimization.jl
           fail_ci_if_error: false

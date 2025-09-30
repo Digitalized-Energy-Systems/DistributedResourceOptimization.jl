@@ -1,4 +1,4 @@
-# Code of Conduct - DistributedOptimization.jl
+# Code of Conduct - DistributedResourceOptimization.jl
 
 ## Our Pledge
 

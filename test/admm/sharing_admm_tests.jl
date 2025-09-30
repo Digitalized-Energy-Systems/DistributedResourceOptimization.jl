@@ -1,5 +1,5 @@
 using Mango
-using DistributedOptimization
+using DistributedResourceOptimization
 using Test
 
 @role struct HandleOptimizationResultRole

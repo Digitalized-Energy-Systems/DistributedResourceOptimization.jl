@@ -1,5 +1,5 @@
 using Mango
-using DistributedOptimization
+using DistributedResourceOptimization
 
 @testset "TestCOHDAWithMangoCarrier" begin
     container = create_tcp_container("127.0.0.1", 5555)

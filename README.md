@@ -1,12 +1,13 @@
 ![lifecycle](https://img.shields.io/badge/lifecycle-experimental-blue.svg)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Digitalized-Energy-Systems/DistributedOptimization.jl/blob/development/LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl/blob/development/LICENSE)
 
 # Distributed Resource Optimization for Julia
 
-The package DistributedOptimization.jl (DO) aims to provide a collection of distributed optimization algorithms. The algorithms are implemented without considering one special communication technique or package. DO provides abstract types and function interfaces to implement so-called carriers, which are able to execute the distributed algorithms asynchronous. All algorithms can also be used without carrier using fitting @spawn or @async statements.
+The package DistributedResourceOptimization.jl (DRO) aims to provide a collection of distributed optimization algorithms for optimizing distributed resources. The algorithms are implemented without considering one special communication technique or package. DRO provides abstract types and function interfaces to implement so-called carriers, which are able to execute the distributed algorithms asynchronous. All algorithms can also be used without carrier using fitting @spawn or @async statements.
 
-Currently there are two tested algorithms:
+Currently there are three tested algorithms:
 * ADMM multi-value consensus such that the sum of all resp values equals a target vector
+* ADMM sharing variant on flexibility providing resources
 * COHDA, Combinatorial Optimization Heuristic for Distributed Agents, which minimizes the distance of schedule sums to a given target schedule
 
 There is one carrier implemented:
@@ -18,7 +19,7 @@ Note that the package is highly work in progress.
 
 ```julia
 using Mango
-using DistributedOptimization
+using DistributedResourceOptimization
 
 @role struct HandleOptimizationResultRole
     got_it::Bool = false
@@ -68,7 +69,7 @@ end
 
 ```julia
 using Mango
-using DistributedOptimization
+using DistributedResourceOptimization
 
 container = create_tcp_container("127.0.0.1", 5555)
 

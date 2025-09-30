@@ -1,7 +1,7 @@
 using Test
-using DistributedOptimization
+using DistributedResourceOptimization
 
-import DistributedOptimization: cohda_default_performance, merge_sysconfigs, merge_candidates,
+import DistributedResourceOptimization: cohda_default_performance, merge_sysconfigs, merge_candidates,
     perceive, decide
 
 @testset "TestCohdaDefaultPerformance" begin
