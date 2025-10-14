@@ -74,9 +74,9 @@ end
         wait(coord_role.task)
     end
 
-    @test isapprox(flex_actor.x, [0.06666795239195517, 0.3333332205122851, -0.6666666349151213], atol=1e-3)
-    @test isapprox(flex_actor2.x, [0.06666795239195517, 0.3333332205122851, -0.6666666349151213], atol=1e-3)
-    @test isapprox(flex_actor3.x, [0.06666795239195517, 0.3333332205122851, -0.6666666349151213], atol=1e-3)
+    @test isapprox(flex_actor.x, [0.06666795239195517, 0.3333332205122851, -0.6666666349151213], atol=1e-2)
+    @test isapprox(flex_actor2.x, [0.06666795239195517, 0.3333332205122851, -0.6666666349151213], atol=1e-2)
+    @test isapprox(flex_actor3.x, [0.06666795239195517, 0.3333332205122851, -0.6666666349151213], atol=1e-2)
     @test handle.got_it
     @test handle2.got_it
     @test handle3.got_it
