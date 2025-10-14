@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Getting Started · DistributedResourceOptimization.jl Documentation</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/theme_overrides.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">DistributedResourceOptimization.jl Documentation</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Getting Started</a></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Getting Started</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Getting Started</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h3 id="Using-the-sharing-ADMM-with-flex-actors-(e.g.-for-resource-optimization)-with-Mango.jl"><a class="docs-heading-anchor" href="#Using-the-sharing-ADMM-with-flex-actors-(e.g.-for-resource-optimization)-with-Mango.jl">Using the sharing ADMM with flex actors (e.g. for resource optimization) with Mango.jl</a><a id="Using-the-sharing-ADMM-with-flex-actors-(e.g.-for-resource-optimization)-with-Mango.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Using-the-sharing-ADMM-with-flex-actors-(e.g.-for-resource-optimization)-with-Mango.jl" title="Permalink"></a></h3><pre><code class="language-julia hljs">using Mango
+using DistributedResourceOptimization
+
+@role struct HandleOptimizationResultRole
+    got_it::Bool = false
+end
+
+function Mango.handle_message(role::HandleOptimizationResultRole, message::OptimizationFinishedMessage, meta::Any)
+    role.got_it = true
+end
+
+container = create_tcp_container(&quot;127.0.0.1&quot;, 5555)
+
+# create participant models
+flex_actor = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
+flex_actor2 = create_admm_flex_actor_one_to_many(15, [0.1, 0.5, -1])
+flex_actor3 = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
+
+# create coordinator with objective
+coordinator = create_sharing_target_distance_admm_coordinator()
+
+# create roles to integrate admm in Mango.jl
+dor = DistributedOptimizationRole(flex_actor, tid=:custom)
+dor2 = DistributedOptimizationRole(flex_actor2, tid=:custom)
+dor3 = DistributedOptimizationRole(flex_actor3, tid=:custom)
+coord_role = CoordinatorRole(coordinator, tid=:custom, include_self=true)
+
+# role to handle a result
+handle = HandleOptimizationResultRole()
+handle2 = HandleOptimizationResultRole()
+handle3 = HandleOptimizationResultRole()
+
+# create agents
+add_agent_composed_of(container, dor, handle)
+c = add_agent_composed_of(container, dor2, handle2)
+ca = add_agent_composed_of(container, coord_role, dor3, handle3)
+
+# create a topology of the agents
+auto_assign!(complete_topology(3, tid=:custom), container)
+
+# run the simulation with start message and wait for result
+activate(container) do
+    wait(send_message(c, StartCoordinatedDistributedOptimization(create_admm_start(create_admm_sharing_data([0.2, 1, -2]))), address(ca)))
+    wait(coord_role.task)
+end</code></pre><h3 id="Using-COHDA-with-Mango.jl"><a class="docs-heading-anchor" href="#Using-COHDA-with-Mango.jl">Using COHDA with Mango.jl</a><a id="Using-COHDA-with-Mango.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Using-COHDA-with-Mango.jl" title="Permalink"></a></h3><pre><code class="language-julia hljs">using Mango
+using DistributedResourceOptimization
+
+container = create_tcp_container(&quot;127.0.0.1&quot;, 5555)
+
+# create agents with local model wrapped in the general distributed optimization role
+agent_one = add_agent_composed_of(container, DistributedOptimizationRole(
+    create_cohda_participant(1, [[0.0, 1, 2], [1, 2, 3]])))
+agent_two = add_agent_composed_of(container, DistributedOptimizationRole(
+    create_cohda_participant(2, [[0.0, 1, 2], [1, 2, 3]])))
+
+# create start message
+initial_message = create_cohda_start_message([1.2, 2, 3])
+
+# create topology
+auto_assign!(complete_topology(2), container)
+
+# run simulation
+activate(container) do
+    send_message(agent_one, initial_message, address(agent_two))
+end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Tuesday 14 October 2025 15:45">Tuesday 14 October 2025</span>. Using Julia version 1.9.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
