@@ -27,5 +27,5 @@ end
 deploydocs(
     repo="github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl.git",
     push_preview=true,
-    devbranch="development"
+    devbranch="main"
 )
