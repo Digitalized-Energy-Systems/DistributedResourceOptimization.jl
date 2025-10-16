@@ -11,6 +11,14 @@ with_logger(logger) do
         sitename="DistributedResourceOptimization.jl Documentation",
         pages=Any["Home"=>"index.md",
             "Getting Started"=>"getting_started.md",
+            "Algorithms" => [
+                "ADMM"=>"algorithms/admm.md",
+                "COHDA"=>"algorithms/cohda.md",
+            ],
+            "Carrier" => [
+                "Simple"=>"carrier/simple.md",
+                "Mango"=>"carrier/mango.md",
+            ],
             "API"=>"api.md"],
         repo="https://github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl",
     )

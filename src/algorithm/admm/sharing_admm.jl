@@ -1,4 +1,4 @@
-export create_sharing_target_distance_admm_coordinator, ADMMSharingGlobalActor, ADMMTargetDistanceObjective, create_admm_sharing_data
+export create_sharing_target_distance_admm_coordinator, ADMMSharingGlobalActor, ADMMTargetDistanceObjective, create_admm_sharing_data, create_sharing_admm_coordinator
 
 using JuMP
 using OSQP
@@ -84,4 +84,14 @@ end
 
 function create_sharing_target_distance_admm_coordinator()
     return ADMMGenericCoordinator(global_actor=ADMMSharingGlobalActor(ADMMTargetDistanceObjective()))
+end
+
+"""
+    create_sharing_admm_coordinator(objective::ADMMGlobalObjective)
+
+# Arguments
+- `objective::ADMMGlobalObjective`: The global objective function to be used in the AD
+"""
+function create_sharing_admm_coordinator(objective::ADMMGlobalObjective)
+    return ADMMGenericCoordinator(global_actor=ADMMSharingGlobalActor(objective))
 end

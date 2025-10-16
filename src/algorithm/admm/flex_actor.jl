@@ -44,6 +44,22 @@ function _create_C_and_d(u::Vector{<:Real})
     return C, d
 end
 
+"""
+    create_admm_flex_actor_one_to_many(in_capacity::Real, η::Vector{Float64}, P::Union{Nothing,Vector{<:Real}}=nothing)
+
+Creates an ADMM flex actor for a one-to-many resource allocation scenario.
+
+# Arguments
+- `in_capacity::Real`: The input capacity of the resource.
+- `η::Vector{Float64}`: Vector of efficiency parameters for the ADMM algorithm.
+- `P::Union{Nothing,Vector{<:Real}}`: Optional vector of priorities. If not provided, defaults to `nothing`.
+
+# Returns
+A flex actor object configured for one-to-many ADMM optimization.
+
+# Notes
+This function is typically used in distributed resource optimization problems where a single resource is allocated to multiple consumers using the ADMM algorithm.
+"""
 function create_admm_flex_actor_one_to_many(in_capacity::Real, η::Vector{Float64}, P::Union{Nothing,Vector{<:Real}}=nothing)
     tech_capacity = in_capacity .* η
 

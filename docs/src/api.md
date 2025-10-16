@@ -46,5 +46,5 @@ Pages = ["algorithm/admm/consensus_admm.jl"]
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["algorithm/admm/conflex_actor.jl"]
+Pages = ["algorithm/admm/flex_actor.jl"]
 ```
