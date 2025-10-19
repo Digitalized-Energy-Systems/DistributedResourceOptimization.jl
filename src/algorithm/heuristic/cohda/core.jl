@@ -270,7 +270,7 @@ function process_exchange_message(algorithm_data::COHDAAlgorithmData, messages::
         # act
         for other in others(carrier, "$(algorithm_data.participant_id)")
             wm = act(algorithm_data, sysconf, candidate)
-            send(carrier, wm, other)
+            send_to_other(carrier, wm, other)
         end
     end
 end

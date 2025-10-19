@@ -116,16 +116,6 @@ function send_to_other(carrier::MangoCarrier, content::Any, receiver::AgentAddre
     return send_message(carrier.parent, content, receiver, optimization_message=true)
 end
 
-mutable struct EventWithValue
-    event::Base.Event
-    value::Any
-end
-
-function Base.wait(event::EventWithValue)
-    wait(event.event)
-    return event.value
-end
-
 function Base.wait(carrier::MangoCarrier, event::EventWithValue)
     wait(carrier.parent.context.agent.scheduler, event.event)
     return event.value
@@ -142,17 +132,6 @@ end
 
 function reply_to_other(carrier::MangoCarrier, content_data::Any, meta::Any)
     reply_to(carrier.parent, content_data, meta)
-end
-
-function send_and_wait_for_answers(carrier::MangoCarrier, content_data::Any, receivers::Vector{AgentAddress})
-    role = carrier.parent
-    event = EventWithValue(Base.Event(), nothing)
-    send_and_handle_answers(role, content_data, receivers, optimization_message=true) do _, answers, _
-        event.value = answers
-        notify(event.event)
-    end
-    wait(event.event)
-    return event.value
 end
 
 function schedule_using(carrier::MangoCarrier, to_be_scheduled::Function, delay_s::Float64)

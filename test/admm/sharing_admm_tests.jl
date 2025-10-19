@@ -226,3 +226,20 @@ end
     @test handle2.got_it
     @test handle3.got_it
 end
+
+
+@testset "TestFlexADMMAWithSimpleCarrierExpress" begin
+    flex_actor = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
+    flex_actor2 = create_admm_flex_actor_one_to_many(15, [0.1, 0.5, -1])
+    flex_actor3 = create_admm_flex_actor_one_to_many(10, [-1.0, 0.0, 1.0])
+    
+    coordinator = create_sharing_target_distance_admm_coordinator()
+
+    admm_start = create_admm_start(create_admm_sharing_data([-4, 0, 6], [5,1,1]))
+
+    start_coordinated_optimization([flex_actor, flex_actor2, flex_actor3], coordinator, admm_start)
+
+    @test isapprox(flex_actor.x, [0.00018920502370025307, -6.385117748282918e-5, 0.0001192856645796826], atol=1e-3)
+    @test isapprox(flex_actor2.x, [0.00018947342781542052, -6.398798323709664e-5, 0.00011955174808086514], atol=1e-3)
+    @test isapprox(flex_actor3.x, [-3.9830282351073403, -7.203077063324391e-7, 3.98302823714599], atol=1e-3)
+end

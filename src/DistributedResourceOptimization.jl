@@ -1,6 +1,7 @@
 
 module DistributedResourceOptimization
 
+include("misc/util.jl")
 include("carrier/core.jl")
 include("algorithm/core.jl")
 include("algorithm/heuristic/cohda/core.jl")
@@ -12,5 +13,6 @@ include("algorithm/admm/consensus_admm.jl")
 include("algorithm/admm/sharing_admm.jl")
 
 include("carrier/mango.jl")
+include("carrier/simple.jl")
 
 end

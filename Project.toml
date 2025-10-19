@@ -13,6 +13,7 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Mango = "5e49fdec-d473-4d14-b295-7bff2fcf1925"
 OSQP = "ab2f91bb-94b4-55e3-9ba0-7f65df51de79"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 AutoHashEquals = "2.2.0"
@@ -23,6 +24,7 @@ LinearAlgebra = "^1.9"
 Mango = "^0.5"
 OSQP = "0.8.1"
 Revise = "3.6.4"
+UUIDs = "1.11.0"
 julia = "^1.9"
 
 [extras]

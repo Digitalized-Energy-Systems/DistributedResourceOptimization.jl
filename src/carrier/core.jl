@@ -1,4 +1,14 @@
-export Carrier, send_to_other, reply_to_other, send_and_wait_for_answers, send_awaitable, schedule_using, others
+export Carrier, send_to_other, reply_to_other, send_awaitable, schedule_using, others
+
+mutable struct EventWithValue
+    event::Base.Event
+    value::Any
+end
+
+function Base.wait(event::EventWithValue)
+    wait(event.event)
+    return event.value
+end
 
 """
     Carrier
@@ -45,27 +55,6 @@ Reply using the given `carrier` to another entity, using the provided `content_d
 - The specific behavior depends on the implementation details of the `Carrier` type.
 """
 function reply_to_other(carrier::Carrier, content_data::Any, meta::Any)
-    throw("NotImplemented")
-end
-
-
-"""
-    send_and_wait_for_answers(carrier::Carrier, content_data::Any, receivers::Any)
-
-Sends `content_data` using `carrier` to the given `receivers` and waits for their responses.
-
-# Arguments
-- `carrier::Carrier`: The carrier object responsible for sending the data.
-- `content_data::Any`: The data to be sent to the receivers.
-- `receivers::Any`: The target receivers to which the data will be sent.
-
-# Returns
-Returns the responses received from the receivers after sending the data.
-
-# Notes
-This function blocks execution until all expected answers are received from the receivers.
-"""
-function send_and_wait_for_answers(carrier::Carrier, content_data::Any, receivers::Any)
     throw("NotImplemented")
 end
 
