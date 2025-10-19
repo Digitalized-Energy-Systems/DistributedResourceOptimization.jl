@@ -24,7 +24,6 @@ LinearAlgebra = "^1.9"
 Mango = "^0.5"
 OSQP = "0.8.1"
 Revise = "3.6.4"
-UUIDs = "1.11.0"
 julia = "^1.9"
 
 [extras]
