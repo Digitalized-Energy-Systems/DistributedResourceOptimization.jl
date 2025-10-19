@@ -24,5 +24,5 @@ end
 
     wait(start_distributed_optimization([actor_one, actor_two], initial_message))
 
-    @test actor_one.actor.memory.solution_candidate.perf < 0
+    @test actor_one.memory.solution_candidate.perf < 0
 end
