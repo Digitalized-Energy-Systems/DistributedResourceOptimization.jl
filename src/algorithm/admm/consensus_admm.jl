@@ -42,6 +42,11 @@ function create_consensus_target_reach_admm_coordinator()
     return ADMMGenericCoordinator(global_actor=ADMMConsensusGlobalActor())
 end
 
+"""
+    create_admm_start_consensus(target::Vector{<:Real})
+
+    Create an `ADMMStart` message for consensus ADMM with the specified target vector.
+"""
 function create_admm_start_consensus(target::Vector{<:Real})
     return ADMMStart(target, length(target))
 end

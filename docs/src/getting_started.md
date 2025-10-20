@@ -1,75 +1,48 @@
-### Using the sharing ADMM with flex actors (e.g. for resource optimization) with Mango.jl
+## Getting Started
+
+### Using the sharing ADMM with flex actors (e.g. for energy resource optimization) 
+
+You can use DRO in two different ways, using the express style, just executing the distributed optimization routine without embedding it into a larger system. For that two different ways are available, distributed and coordinated optimization.
+
+#### Coordinated (ADMM Sharing with resource actors)
 
 ```julia
-using Mango
 using DistributedResourceOptimization
 
-@role struct HandleOptimizationResultRole
-    got_it::Bool = false
-end
-
-function Mango.handle_message(role::HandleOptimizationResultRole, message::OptimizationFinishedMessage, meta::Any)
-    role.got_it = true
-end
-
-container = create_tcp_container("127.0.0.1", 5555)
-
-# create participant models
 flex_actor = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
 flex_actor2 = create_admm_flex_actor_one_to_many(15, [0.1, 0.5, -1])
-flex_actor3 = create_admm_flex_actor_one_to_many(10, [0.1, 0.5, -1])
+flex_actor3 = create_admm_flex_actor_one_to_many(10, [-1.0, 0.0, 1.0])
 
-# create coordinator with objective
 coordinator = create_sharing_target_distance_admm_coordinator()
 
-# create roles to integrate admm in Mango.jl
-dor = DistributedOptimizationRole(flex_actor, tid=:custom)
-dor2 = DistributedOptimizationRole(flex_actor2, tid=:custom)
-dor3 = DistributedOptimizationRole(flex_actor3, tid=:custom)
-coord_role = CoordinatorRole(coordinator, tid=:custom, include_self=true)
+admm_start = create_admm_start(create_admm_sharing_data([-4, 0, 6], [5,1,1]))
 
-# role to handle a result
-handle = HandleOptimizationResultRole()
-handle2 = HandleOptimizationResultRole()
-handle3 = HandleOptimizationResultRole()
-
-# create agents
-add_agent_composed_of(container, dor, handle)
-c = add_agent_composed_of(container, dor2, handle2)
-ca = add_agent_composed_of(container, coord_role, dor3, handle3)
-
-# create a topology of the agents
-auto_assign!(complete_topology(3, tid=:custom), container)
-
-# run the simulation with start message and wait for result
-activate(container) do
-    wait(send_message(c, StartCoordinatedDistributedOptimization(create_admm_start(create_admm_sharing_data([0.2, 1, -2]))), address(ca)))
-    wait(coord_role.task)
-end
+start_coordinated_optimization([flex_actor, flex_actor2, flex_actor3], coordinator, admm_start)
 ```
 
-### Using COHDA with Mango.jl
+#### Distributed (COHDA)
 
 ```julia
-using Mango
 using DistributedResourceOptimization
 
-container = create_tcp_container("127.0.0.1", 5555)
+actor_one = create_cohda_participant(1, [[0.0, 1, 2], [1, 2, 3]])
+actor_two = create_cohda_participant(2, [[0.0, 1, 2], [1, 2, 3]])
 
-# create agents with local model wrapped in the general distributed optimization role
-agent_one = add_agent_composed_of(container, DistributedOptimizationRole(
-    create_cohda_participant(1, [[0.0, 1, 2], [1, 2, 3]])))
-agent_two = add_agent_composed_of(container, DistributedOptimizationRole(
-    create_cohda_participant(2, [[0.0, 1, 2], [1, 2, 3]])))
-
-# create start message
 initial_message = create_cohda_start_message([1.2, 2, 3])
 
-# create topology
-auto_assign!(complete_topology(2), container)
+wait(start_distributed_optimization([actor_one, actor_two], initial_message))
+```
 
-# run simulation
-activate(container) do
-    send_message(agent_one, initial_message, address(agent_two))
-end
+If you need more control, e.g. when integrate the optimization into a larger system we recommend using the carrier system directly, e.g with the built-in carrier:
+
+```julia
+using DistributedResourceOptimization
+
+container = ActorContainer()
+actor_one = SimpleCarrier(container, create_cohda_participant(1, [[0.0, 1, 2], [1, 2, 3]]))
+actor_two = SimpleCarrier(container, create_cohda_participant(2, [[0.0, 1, 2], [1, 2, 3]]))
+
+initial_message = create_cohda_start_message([1.2, 2, 3])
+
+wait(send_to_other(actor_one, initial_message, cid(actor_two))) 
 ```

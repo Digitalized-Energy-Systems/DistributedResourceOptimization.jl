@@ -7,9 +7,8 @@ Currently there are three tested algorithms:
 * ADMM sharing variant on flexibility providing resources
 * COHDA, Combinatorial Optimization Heuristic for Distributed Agents, which minimizes the distance of schedule sums to a given target schedule
 
-There is one carrier implemented:
+There are two carrier implemented:
+* A lightweight built-in carrier
 * Mango.jl, agent framework for the simulation of distributed systems, DO provides roles to which the specific algorithms can be assigned to
 
-Note that the package is highly work in progress. 
-
-However, DRO is available on the general Julia registry, and can therfore be installed calling `]add DistributedResourceOptimization`.
+Note that the package is still work in progress.

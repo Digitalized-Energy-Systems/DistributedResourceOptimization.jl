@@ -16,7 +16,7 @@ Private = false
 Pages = ["carrier/core.jl"]
 ```
 
-## Simple
+### Simple
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
@@ -24,7 +24,7 @@ Private = false
 Pages = ["carrier/simple.jl"]
 ```
 
-## Mango
+### Mango
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
@@ -33,7 +33,8 @@ Pages = ["carrier/mango.jl"]
 ```
 
 # ADMM
-## ADMM Sharing
+
+### Sharing
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
@@ -41,7 +42,7 @@ Private = false
 Pages = ["algorithm/admm/sharing_admm.jl"]
 ```
 
-## ADMM Consensus
+### Consensus
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
@@ -49,7 +50,7 @@ Private = false
 Pages = ["algorithm/admm/consensus_admm.jl"]
 ```
 
-## ADMM Flex
+### Actors
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
