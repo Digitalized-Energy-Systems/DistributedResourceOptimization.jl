@@ -89,3 +89,8 @@ html.theme--documenter-dark #documenter .docs-sidebar ul.docs-menu {
 html.theme--documenter-dark #documenter .docs-main .docs-footer {
   border-color: #2f4547;
 }
+
+#documenter .docs-sidebar .docs-logo>img {
+    max-height: 10rem !important;
+    margin: auto;
+}
