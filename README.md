@@ -1,3 +1,9 @@
+<p align="center">
+
+![logo](docs/src/assets/logo.svg)
+
+</p>
+
 ![lifecycle](https://img.shields.io/badge/lifecycle-experimental-blue.svg)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl/blob/development/LICENSE)
 
