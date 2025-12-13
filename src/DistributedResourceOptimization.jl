@@ -12,6 +12,9 @@ include("algorithm/admm/flex_actor.jl")
 include("algorithm/admm/consensus_admm.jl")
 include("algorithm/admm/sharing_admm.jl")
 
+include("algorithm/consensus/averaging.jl")
+include("algorithm/consensus/economic_dispatch.jl")
+
 include("carrier/mango.jl")
 include("carrier/simple.jl")
 

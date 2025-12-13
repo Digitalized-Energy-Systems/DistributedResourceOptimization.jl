@@ -145,3 +145,7 @@ function others(carrier::MangoCarrier, participant_id::String)
         return topology_neighbors(carrier.parent, tid=carrier.parent.tid)
     end
 end
+
+function get_address(carrier::MangoCarrier)
+    return address(carrier.parent)
+end

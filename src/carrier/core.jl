@@ -1,4 +1,4 @@
-export Carrier, send_to_other, reply_to_other, send_awaitable, schedule_using, others
+export Carrier, send_to_other, reply_to_other, send_awaitable, schedule_using, others, get_address
 
 mutable struct EventWithValue
     event::Base.Event
@@ -123,5 +123,9 @@ Returns a collection of participants in the given `carrier` excluding the partic
 - A collection (e.g., array or set) of participants other than the one with `participant_id`.
 """
 function others(carrier::Carrier, participant_id::String)
+    throw("NotImplemented")
+end
+
+function get_address(carrier::Carrier)
     throw("NotImplemented")
 end

@@ -100,6 +100,10 @@ function others(carrier::SimpleCarrier, id::String)
     return setdiff!(collect(range(1, length(carrier.container.actors))), [cid(carrier)])
 end
 
+function get_address(carrier::SimpleCarrier)
+    return cid(carrier)
+end
+
 """
     start_distributed_optimization(actors::Vector{<:DistributedAlgorithm}, start_message::Any)
 
