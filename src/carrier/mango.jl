@@ -103,7 +103,7 @@ function DistributedOptimizationRole(algorithm::DistributedAlgorithm; tid::Symbo
 end
 
 function Mango.handle_message(role::DistributedOptimizationRole, message::Any, meta::Any)
-    if haskey(meta, "optimization_message") && meta["optimization_message"]
+    if haskey(meta, "optimization_message") && meta["optimization_message"] || message isa OptimizationMessage
         on_exchange_message(role.algorithm, role.carrier, message, meta)
     end
 end

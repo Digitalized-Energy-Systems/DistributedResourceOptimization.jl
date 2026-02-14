@@ -8,6 +8,10 @@ Subtypes should implement specific distributed algorithm logic for resource opti
 """
 abstract type DistributedAlgorithm end
 
+"""
+Supertype for any optimization message. Used to detect whether the message is part of an optimization
+"""
+abstract type OptimizationMessage end
 
 """
     on_exchange_message(algorithm::DistributedAlgorithm, carrier::Carrier, message_data::Any, meta::Any)
@@ -27,6 +31,7 @@ Processes the received exchange message, updating the algorithm's state or trigg
 May return a result or perform side effects depending on the implementation.
 """
 function on_exchange_message(algorithm::DistributedAlgorithm, carrier::Carrier, message_data::Any, meta::Any)
+    @error algorithm carrier message_data meta
     throw("NotImplementedOrWrongArgumentTypes")
 end
 

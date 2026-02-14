@@ -3,11 +3,11 @@ export LinearCostEconomicDispatchConsensusActor
 @kwdef mutable struct LinearCostEconomicDispatchConsensusActor <: ConsensusActor
     cost::Real
     P_max::Real
-    ρ::Real = 0.01
+    ρ::Real = 0.05
     ϵ::Real = 0.1
     P_min::Real = 0
     N_guess::Int = 10
-    P::Vector{Float64} = Vector{Real}()
+    P::Vector{Float64} = [0]
 end
 
 function DistributedResourceOptimization.gradient_term(actor::LinearCostEconomicDispatchConsensusActor, λ::Vector{<:Real}, P_target::Vector{<:Real})
