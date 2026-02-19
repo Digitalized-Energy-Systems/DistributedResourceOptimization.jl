@@ -128,9 +128,6 @@ The generic ADMM coordinator ([`ADMMGenericCoordinator`](@ref)) exposes several 
 | `max_iters` | `1000` | Maximum number of ADMM iterations |
 | `abs_tol` | `1e-4` | Absolute primal/dual residual tolerance |
 | `rel_tol` | `1e-3` | Relative primal/dual residual tolerance |
-| `μ` | `10` | Residual ratio threshold for ρ adaptation |
-| `τ` | `2` | Multiplicative factor for ρ adaptation |
-| `slack_penalty` | `100` | Penalty for infeasibility slack variables |
 
 ## Complete Example — ADMM Sharing
 
@@ -179,7 +176,7 @@ println(result(actor2))
     - Reducing `ρ` when primal residuals dominate
     - Increasing `ρ` when dual residuals dominate
     - Tightening `abs_tol` / `rel_tol` for higher precision
-    - Increasing `max_iters` for complex problems
+    - Increasing `max_iters` if the warning "reached max iterations" appears
 
 ## See Also
 

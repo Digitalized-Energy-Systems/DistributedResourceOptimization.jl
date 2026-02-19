@@ -1,4 +1,4 @@
-export ADMMStart, ADMMAnswer, ADMMAnswer, ADMMGlobalActor, ADMMGlobalObjective, ADMMGenericCoordinator, create_admm_start
+export ADMMStart, ADMMAnswer, ADMMGlobalActor, ADMMGlobalObjective, ADMMGenericCoordinator, create_admm_start
 
 struct ADMMStart
     data::Any
@@ -52,13 +52,10 @@ end
 
 @kwdef struct ADMMGenericCoordinator <: Coordinator
     global_actor::ADMMGlobalActor
-    ρ::Float64 = 1.0 
+    ρ::Float64 = 1.0
     max_iters::Int64 = 1000
-    slack_penalty::Int64 = 100
     abs_tol::Float64 = 1e-4
     rel_tol::Float64 = 1e-3
-    μ::Real = 10
-    τ::Real = 2
 end
 
 # ADMM solver
@@ -68,8 +65,6 @@ function _start_coordinator(admm::ADMMGenericCoordinator, carrier::Carrier, inpu
     abs_tol = admm.abs_tol
     rel_tol = admm.rel_tol
     n = length(others(carrier, "coordinator"))
-    μ = admm.μ
-    τ = admm.τ
 
     # Initialize
     x = [zeros(m) for i in 1:n]
@@ -80,7 +75,7 @@ function _start_coordinator(admm::ADMMGenericCoordinator, carrier::Carrier, inpu
         # 1. Local x-updates (in parallel)
         awaitables = []
         # send all async and get awaitable
-        for (i,addr) in enumerate(others(carrier, "c"))
+        for (i,addr) in enumerate(others(carrier, "coordinator"))
             push!(awaitables, send_awaitable(carrier, ADMMMessage(actor_correction(admm.global_actor, x, z, u, i), ρ), addr))
         end
         # await all awaitables and update x
@@ -103,21 +98,12 @@ function _start_coordinator(admm::ADMMGenericCoordinator, carrier::Carrier, inpu
         ϵ_pri = sqrt(m*n)*abs_tol + rel_tol*max(maximum(norm.(x)), maximum(norm.(z)))
         ϵ_dual = sqrt(m*n)*abs_tol + rel_tol*maximum(norm.(u))
         if r_norm < ϵ_pri && s_norm < ϵ_dual
-            @warn "Converged in $k iterations."
+            @debug "ADMM converged in $k iterations."
             break
         end
-        
-        # Varying penalty paramter according to B. S. He, H. Yang, and S. L. Wang, “Alternating direction method with self
-        # adaptive penalty parameters for monotone variational inequalities,”
-        # if r_norm > μ * s_norm
-        #     ρ = ρ * τ
-        # elseif s_norm > μ * r_norm
-        #     ρ = ρ / τ
-        # end
-        
+
         if k == max_iters
-            @warn "Reached max iterations ($max_iters) without full convergence."
-            throw("ADMM not converged $x, $u")
+            @warn "ADMM reached max iterations ($max_iters) without full convergence (r=$r_norm, s=$s_norm)."
         end
     end
     return x, z, u

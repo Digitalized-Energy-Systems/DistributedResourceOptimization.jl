@@ -1,5 +1,5 @@
 
-export ConsensusActor, NoConsensusActor, AveragingConsensusAlgorithm, AveragingConsensusMessage, create_averaging_consensus_participant, gradient_term
+export ConsensusActor, NoConsensusActor, AveragingConsensusAlgorithm, AveragingConsensusMessage, create_averaging_consensus_participant, create_averaging_consensus_start, gradient_term
 
 abstract type ConsensusActor end
 
@@ -78,8 +78,19 @@ function on_exchange_message(algorithm_data::AveragingConsensusAlgorithm, carrie
     end
 end
 
-function create_averaging_consensus_participant(finish_callback::Function, consensus_actor::ConsensusActor; initial_λ::Real=10, α::Real=0.3, max_iter::Int=50) 
+function create_averaging_consensus_participant(finish_callback::Function, consensus_actor::ConsensusActor; initial_λ::Real=10, α::Real=0.3, max_iter::Int=50)
     appl_consensus_actor = isnothing(consensus_actor) ? NoConsensusActor() : consensus_actor
-    
+
     return AveragingConsensusAlgorithm(finish_callback=finish_callback, initial_λ=initial_λ, α=α, actor=appl_consensus_actor, max_iter=max_iter)
+end
+
+"""
+    create_averaging_consensus_start(initial_λ::Real, data::Any=nothing) -> AveragingConsensusMessage
+
+Create the initial start message for averaging consensus. `initial_λ` sets the starting
+price/signal value (scalar, broadcast to all dimensions), and `data` is any auxiliary
+payload forwarded unchanged to each participant's `gradient_term`.
+"""
+function create_averaging_consensus_start(initial_λ::Real, data::Any=nothing)
+    return AveragingConsensusMessage([initial_λ], 0, data, true)
 end

@@ -1,5 +1,5 @@
 export on_exchange_message, ScheduleSelection, SystemConfig, SolutionCandidate, TargetParams,
-    WorkingMemory, COHDAAlgorithmData, create_cohda_start_message, create_cohda_participant
+    WorkingMemory, COHDAAlgorithmData, create_cohda_start_message, create_cohda_participant, result
 
 using AutoHashEquals
 
@@ -56,7 +56,7 @@ end
 end
 
 function initial_schedule(local_decider::DefaultLocalDecider, memory::WorkingMemory)
-    return local_decider.schedule_provider(memory)[0]
+    return local_decider.schedule_provider(memory)[1]
 end
 
 @kwdef mutable struct COHDAAlgorithmData <: DistributedAlgorithm
@@ -64,7 +64,7 @@ end
     counter::Int = 0
     memory::WorkingMemory = WorkingMemory(nothing, SystemConfig(Dict()), nothing)
     performance_function::Function = cohda_default_performance
-    decider::LocalDecider = DefaultLocalDecider()
+    decider::Union{LocalDecider,Nothing} = nothing
 end
 
 function decide(cohda_data::COHDAAlgorithmData, decider::LocalDecider, sysconfig::SystemConfig, candidate::SolutionCandidate)
@@ -211,7 +211,7 @@ function create_from_updated_sysconf(participant_id::Int, sysconfig::SystemConfi
         base_mat[id, :] = choice.schedule
     end
     base_mat[participant_id, :] = new_schedule
-    return SolutionCandidate(participant_id, base_mat, nothing, keys(sysconfig.schedule_choices))
+    return SolutionCandidate(participant_id, base_mat, nothing, Set{Int}(keys(sysconfig.schedule_choices)))
 end
 
 function decide(cohda_data::COHDAAlgorithmData, decider::DefaultLocalDecider, sysconfig::SystemConfig, candidate::SolutionCandidate)
@@ -311,6 +311,16 @@ function create_cohda_participant_with_decider(participant_id::Int,
     return COHDAAlgorithmData(participant_id=participant_id,
         performance_function=performance_function,
         decider=decider)
+end
+
+"""
+    result(actor::COHDAAlgorithmData) -> Vector{Float64}
+
+Return the aggregate schedule chosen by the COHDA optimization — the column-wise sum of
+all participants' schedules in the best solution candidate known to this actor.
+"""
+function result(actor::COHDAAlgorithmData)
+    return vec(sum(actor.memory.solution_candidate.schedules, dims=1))
 end
 
 

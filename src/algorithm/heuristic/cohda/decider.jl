@@ -3,10 +3,10 @@ using Distributions
 
 @kwdef struct LocalSearchDecider <: LocalDecider
     initial_schedule::Vector{Float64}
-    corridors::Vector{Tuple{Float64}}
+    corridors::Vector{Tuple{Float64,Float64}}
     local_performance::Function
     convergence_force_factor::Float64 = 0.1
-    max_iterations = 10
+    max_iterations::Int = 10
     sample_size_per_value::Int = 10
     distribution::Function = (low, up) -> Uniform(low, up)
 end
@@ -20,18 +20,19 @@ function local_performance_with_global_share(decider::LocalSearchDecider, schedu
 end
 
 function find_new_value(decider::LocalSearchDecider, current_index::Int, current_best_schedule::Vector{Float64}, delta_to_target::Float64)
-    possible_values = rand(decider.distribution, decider.sample_size_per_value)
+    corridor = decider.corridors[current_index]
+    possible_values = rand(decider.distribution(corridor[1], corridor[2]), decider.sample_size_per_value)
     current_value = current_best_schedule[current_index]
     new_value_performance_tuples::Vector{Tuple{Float64,Float64}} = []
     new_value = nothing
     iteration = 1
-    while length(possible_values) > 0 || iteration > decider.max_iterations
+    while length(possible_values) > 0 && iteration <= decider.max_iterations
         copy_bs = copy(current_best_schedule)
         random_index = ceil(Int, rand() * length(possible_values))
         new_value = possible_values[random_index]
         copy_bs[current_index] = new_value
 
-        # we calculate the performance with a variable local performance share and a adaptive global performance share 
+        # we calculate the performance with a variable local performance share and a adaptive global performance share
         performance = local_performance_with_global_share(decider, copy_bs, new_value, current_value, delta_to_target)
 
         push!(new_value_performance_tuples, (new_value, performance))
@@ -41,7 +42,7 @@ function find_new_value(decider::LocalSearchDecider, current_index::Int, current
             sort!(new_value_performance_tuples)
             first = new_value_performance_tuples[1][1]
             second = new_value_performance_tuples[2][1]
-            third = new_value_performance_tuples[2][1]
+            third = new_value_performance_tuples[3][1]
 
             # cut out undesirable parts of the whole vector
             if first > second > third

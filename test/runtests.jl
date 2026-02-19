@@ -12,7 +12,7 @@ function DistributedResourceOptimization.send_to_other(carrier::TestCarrier, con
     push!(message_buffer, content)
 end
 
-function DistributedResourceOptimization.schedule_using(to_be_scheduled::Function, carrier::TestCarrier, delay_s::Float64)
+function DistributedResourceOptimization.schedule_using(carrier::TestCarrier, to_be_scheduled::Function, ::Float64)
     to_be_scheduled()
 end
 
