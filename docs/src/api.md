@@ -1,59 +1,95 @@
-# API
+# API Reference
 
-# Algorithm Core Functions
+Complete documentation for all exported types and functions.
+
+## Core Abstractions
+
+### Algorithm Interface
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["algorithm/core.jl"]
+Pages   = ["algorithm/core.jl"]
 ```
 
-# Carrier
+### Carrier Interface
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["carrier/core.jl"]
+Pages   = ["carrier/core.jl"]
 ```
 
-### Simple
+---
+
+## Carriers
+
+### SimpleCarrier
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["carrier/simple.jl"]
+Pages   = ["carrier/simple.jl"]
 ```
 
-### Mango
+### MangoCarrier
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["carrier/mango.jl"]
+Pages   = ["carrier/mango.jl"]
 ```
 
-# ADMM
+---
 
-### Sharing
+## Algorithms
+
+### ADMM — Core
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["algorithm/admm/sharing_admm.jl"]
+Pages   = ["algorithm/admm/core.jl"]
 ```
 
-### Consensus
+### ADMM — Sharing Variant
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["algorithm/admm/consensus_admm.jl"]
+Pages   = ["algorithm/admm/sharing_admm.jl"]
 ```
 
-### Actors
+### ADMM — Consensus Variant
 
 ```@autodocs
 Modules = [DistributedResourceOptimization]
 Private = false
-Pages = ["algorithm/admm/flex_actor.jl"]
+Pages   = ["algorithm/admm/consensus_admm.jl"]
+```
+
+### ADMM — Flexibility Actor
+
+```@autodocs
+Modules = [DistributedResourceOptimization]
+Private = false
+Pages   = ["algorithm/admm/flex_actor.jl"]
+```
+
+### COHDA
+
+```@autodocs
+Modules = [DistributedResourceOptimization]
+Private = false
+Pages   = ["algorithm/heuristic/cohda/core.jl",
+           "algorithm/heuristic/cohda/decider.jl"]
+```
+
+### Averaging Consensus
+
+```@autodocs
+Modules = [DistributedResourceOptimization]
+Private = false
+Pages   = ["algorithm/consensus/averaging.jl",
+           "algorithm/consensus/economic_dispatch.jl"]
 ```

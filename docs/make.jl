@@ -14,12 +14,21 @@ with_logger(logger) do
             "Algorithms" => [
                 "ADMM"=>"algorithms/admm.md",
                 "COHDA"=>"algorithms/cohda.md",
+                "Averaging Consensus"=>"algorithms/consensus.md",
             ],
-            "Carrier" => [
-                "Simple"=>"carrier/simple.md",
-                "Mango"=>"carrier/mango.md",
+            "Carriers" => [
+                "SimpleCarrier"=>"carrier/simple.md",
+                "MangoCarrier"=>"carrier/mango.md",
             ],
-            "API"=>"api.md"],
+            "Tutorials" => [
+                "Energy Dispatch (ADMM)"=>"tutorials/energy_dispatch.md",
+                "Schedule Coordination (COHDA)"=>"tutorials/schedule_coordination.md",
+            ],
+            "How-To Guides" => [
+                "Custom Algorithm"=>"howtos/custom_algorithm.md",
+                "Custom Carrier"=>"howtos/custom_carrier.md",
+            ],
+            "API Reference"=>"api.md"],
         repo="https://github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl",
     )
 end
