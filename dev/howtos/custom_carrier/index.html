@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Custom Carrier · DistributedResourceOptimization.jl Documentation</title><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/theme_overrides.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="DistributedResourceOptimization.jl Documentation logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">DistributedResourceOptimization.jl Documentation</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../getting_started/">Getting Started</a></li><li><span class="tocitem">Algorithms</span><ul><li><a class="tocitem" href="../../algorithms/admm/">ADMM</a></li><li><a class="tocitem" href="../../algorithms/cohda/">COHDA</a></li><li><a class="tocitem" href="../../algorithms/consensus/">Averaging Consensus</a></li></ul></li><li><span class="tocitem">Carriers</span><ul><li><a class="tocitem" href="../../carrier/simple/">SimpleCarrier</a></li><li><a class="tocitem" href="../../carrier/mango/">MangoCarrier</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../../tutorials/energy_dispatch/">Energy Dispatch (ADMM)</a></li><li><a class="tocitem" href="../../tutorials/schedule_coordination/">Schedule Coordination (COHDA)</a></li></ul></li><li><span class="tocitem">How-To Guides</span><ul><li><a class="tocitem" href="../custom_algorithm/">Custom Algorithm</a></li><li class="is-active"><a class="tocitem" href>Custom Carrier</a><ul class="internal"><li><a class="tocitem" href="#The-Interface"><span>The Interface</span></a></li><li><a class="tocitem" href="#Step-by-Step-Example-—-Logging-Carrier"><span>Step-by-Step Example — Logging Carrier</span></a></li><li><a class="tocitem" href="#Building-a-Carrier-from-Scratch"><span>Building a Carrier from Scratch</span></a></li><li><a class="tocitem" href="#Checklist"><span>Checklist</span></a></li><li><a class="tocitem" href="#See-Also"><span>See Also</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">How-To Guides</a></li><li class="is-active"><a href>Custom Carrier</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Custom Carrier</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="How-To:-Implement-a-Custom-Carrier"><a class="docs-heading-anchor" href="#How-To:-Implement-a-Custom-Carrier">How To: Implement a Custom Carrier</a><a id="How-To:-Implement-a-Custom-Carrier-1"></a><a class="docs-heading-anchor-permalink" href="#How-To:-Implement-a-Custom-Carrier" title="Permalink"></a></h1><p>A <em>carrier</em> is the communication layer that delivers messages between algorithm participants. DRO ships with <code>SimpleCarrier</code> (in-process) and <code>MangoCarrier</code> (Mango.jl TCP). This guide shows how to write your own.</p><h2 id="The-Interface"><a class="docs-heading-anchor" href="#The-Interface">The Interface</a><a id="The-Interface-1"></a><a class="docs-heading-anchor-permalink" href="#The-Interface" title="Permalink"></a></h2><p>All carriers extend <code>Carrier</code> and implement six functions:</p><pre><code class="language-julia hljs">abstract type Carrier end
+
+# Send a message to another participant (fire-and-forget)
+send_to_other(::Carrier, content::Any, receiver::Any)
+
+# Reply to the sender of an incoming message
+reply_to_other(::Carrier, content::Any, meta::Any)
+
+# Send a message and return an awaitable handle
+send_awaitable(::Carrier, content::Any, receiver::Any)
+
+# Block until an awaitable handle completes; return its value
+Base.wait(::Carrier, waitable::Any)
+
+# Schedule a zero-argument function after `delay_s` seconds
+schedule_using(::Carrier, f::Function, delay_s::Float64)
+
+# Return IDs of all other participants (excluding self)
+others(::Carrier, self_id::String)</code></pre><p>You do not need to implement <code>get_address</code> unless your carrier is used with parts of the codebase that call it explicitly.</p><h2 id="Step-by-Step-Example-—-Logging-Carrier"><a class="docs-heading-anchor" href="#Step-by-Step-Example-—-Logging-Carrier">Step-by-Step Example — Logging Carrier</a><a id="Step-by-Step-Example-—-Logging-Carrier-1"></a><a class="docs-heading-anchor-permalink" href="#Step-by-Step-Example-—-Logging-Carrier" title="Permalink"></a></h2><p>Here is a carrier that wraps <code>SimpleCarrier</code> and logs every message send. It is a useful debugging wrapper for any algorithm.</p><h3 id=".-Define-the-Struct"><a class="docs-heading-anchor" href="#.-Define-the-Struct">1. Define the Struct</a><a id=".-Define-the-Struct-1"></a><a class="docs-heading-anchor-permalink" href="#.-Define-the-Struct" title="Permalink"></a></h3><pre><code class="language-julia hljs">using DistributedResourceOptimization
+
+struct LoggingCarrier &lt;: Carrier
+    inner::SimpleCarrier
+end</code></pre><h3 id=".-Delegate-and-Log"><a class="docs-heading-anchor" href="#.-Delegate-and-Log">2. Delegate and Log</a><a id=".-Delegate-and-Log-1"></a><a class="docs-heading-anchor-permalink" href="#.-Delegate-and-Log" title="Permalink"></a></h3><p>Implement each required function by delegating to the inner carrier:</p><pre><code class="language-julia hljs">function send_to_other(c::LoggingCarrier, content::Any, receiver::Any)
+    @info &quot;[LoggingCarrier] send → $receiver: $(typeof(content))&quot;
+    send_to_other(c.inner, content, receiver)
+end
+
+function reply_to_other(c::LoggingCarrier, content::Any, meta::Any)
+    sender = get(meta, :sender, &quot;?&quot;)
+    @info &quot;[LoggingCarrier] reply → $sender: $(typeof(content))&quot;
+    reply_to_other(c.inner, content, meta)
+end
+
+function send_awaitable(c::LoggingCarrier, content::Any, receiver::Any)
+    @info &quot;[LoggingCarrier] send_awaitable → $receiver: $(typeof(content))&quot;
+    send_awaitable(c.inner, content, receiver)
+end
+
+function Base.wait(c::LoggingCarrier, waitable::Any)
+    wait(c.inner, waitable)
+end
+
+function schedule_using(c::LoggingCarrier, f::Function, delay_s::Float64)
+    schedule_using(c.inner, f, delay_s)
+end
+
+function others(c::LoggingCarrier, self_id::String)
+    others(c.inner, self_id)
+end</code></pre><h3 id=".-Wire-It-Up"><a class="docs-heading-anchor" href="#.-Wire-It-Up">3. Wire It Up</a><a id=".-Wire-It-Up-1"></a><a class="docs-heading-anchor-permalink" href="#.-Wire-It-Up" title="Permalink"></a></h3><p>Because algorithm dispatch happens through <code>on_exchange_message(algo, carrier, msg, meta)</code>, you need to make sure your carrier is passed there. The easiest way is to subclass the relevant role or override dispatch — but for simple wrapping, you can construct <code>LoggingCarrier</code> around an existing <code>SimpleCarrier</code>:</p><pre><code class="language-julia hljs">using DistributedResourceOptimization
+
+container = ActorContainer()
+
+algo1 = create_cohda_participant(1, [[0.0, 1.0], [1.0, 2.0]])
+algo2 = create_cohda_participant(2, [[0.0, 1.0], [1.0, 2.0]])
+
+sc1 = SimpleCarrier(container, algo1)
+sc2 = SimpleCarrier(container, algo2)
+
+lc1 = LoggingCarrier(sc1)   # wraps carrier 1 for logging
+
+start_msg = create_cohda_start_message([1.0, 2.0])
+
+wait(send_to_other(lc1, start_msg, cid(sc2)))</code></pre><h2 id="Building-a-Carrier-from-Scratch"><a class="docs-heading-anchor" href="#Building-a-Carrier-from-Scratch">Building a Carrier from Scratch</a><a id="Building-a-Carrier-from-Scratch-1"></a><a class="docs-heading-anchor-permalink" href="#Building-a-Carrier-from-Scratch" title="Permalink"></a></h2><p>If you want a completely independent carrier (e.g., backed by ZeroMQ or HTTP), follow these principles:</p><ol><li><p><strong>Message dispatch</strong> — When a message arrives (from the network, a queue, etc.), call <code>on_exchange_message(algorithm, your_carrier, message_data, meta)</code>.</p></li><li><p><strong>Metadata</strong> — The <code>meta</code> dict passed to <code>on_exchange_message</code> must contain at least <code>:sender</code> so that <code>reply_to_other</code> can route the response back. Additional keys are carrier-specific.</p></li><li><p><strong>Awaitable pattern</strong> — <code>send_awaitable</code> must return something that <code>Base.wait</code> can block on. The simplest implementation uses <code>EventWithValue</code>:</p><pre><code class="language-julia hljs">function send_awaitable(c::MyCarrier, content::Any, receiver::Any)
+    event = EventWithValue(Base.Event(), nothing)
+    # store event keyed by a message ID; resolve it when the reply arrives
+    c.pending[my_id] = event
+    _dispatch_message(c, content, receiver, my_id)
+    return event
+end
+
+function Base.wait(c::MyCarrier, ev::EventWithValue)
+    wait(ev.event)
+    return ev.value
+end</code></pre></li><li><p><strong><code>others</code></strong> — Return a collection of addresses/IDs that the algorithm can pass back to <code>send_to_other</code>. The type is up to you; just be consistent.</p></li></ol><h2 id="Checklist"><a class="docs-heading-anchor" href="#Checklist">Checklist</a><a id="Checklist-1"></a><a class="docs-heading-anchor-permalink" href="#Checklist" title="Permalink"></a></h2><ul><li>[ ] Subtype <code>Carrier</code></li><li>[ ] Implement <code>send_to_other</code></li><li>[ ] Implement <code>reply_to_other</code></li><li>[ ] Implement <code>send_awaitable</code> returning something <code>Base.wait</code>-able</li><li>[ ] Implement <code>Base.wait(carrier, waitable)</code></li><li>[ ] Implement <code>schedule_using</code></li><li>[ ] Implement <code>others</code></li><li>[ ] Call <code>on_exchange_message</code> when an inbound message arrives</li></ul><h2 id="See-Also"><a class="docs-heading-anchor" href="#See-Also">See Also</a><a id="See-Also-1"></a><a class="docs-heading-anchor-permalink" href="#See-Also" title="Permalink"></a></h2><ul><li><a href="../../api/#DistributedResourceOptimization.Carrier"><code>Carrier</code></a>, <a href="../../api/#DistributedResourceOptimization.send_to_other-Tuple{Carrier, Any, Any}"><code>send_to_other</code></a>, <a href="../../api/#DistributedResourceOptimization.reply_to_other-Tuple{Carrier, Any, Any}"><code>reply_to_other</code></a></li><li><a href="../../api/#DistributedResourceOptimization.send_awaitable-Tuple{Carrier, Any, Any}"><code>send_awaitable</code></a>, <a href="../../api/#DistributedResourceOptimization.schedule_using-Tuple{Carrier, Function, Float64}"><code>schedule_using</code></a>, <a href="../../api/#DistributedResourceOptimization.others-Tuple{Carrier, String}"><code>others</code></a></li><li><a href="../../api/#DistributedResourceOptimization.SimpleCarrier"><code>SimpleCarrier</code></a> — reference implementation in <code>src/carrier/simple.jl</code></li><li><a href="../custom_algorithm/">How To: Implement a Custom Algorithm</a></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../custom_algorithm/">« Custom Algorithm</a><a class="docs-footer-nextpage" href="../../api/">API Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Thursday 19 February 2026 19:11">Thursday 19 February 2026</span>. Using Julia version 1.9.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

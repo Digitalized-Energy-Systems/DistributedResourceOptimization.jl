@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Schedule Coordination (COHDA) · DistributedResourceOptimization.jl Documentation</title><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/theme_overrides.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="DistributedResourceOptimization.jl Documentation logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">DistributedResourceOptimization.jl Documentation</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../getting_started/">Getting Started</a></li><li><span class="tocitem">Algorithms</span><ul><li><a class="tocitem" href="../../algorithms/admm/">ADMM</a></li><li><a class="tocitem" href="../../algorithms/cohda/">COHDA</a></li><li><a class="tocitem" href="../../algorithms/consensus/">Averaging Consensus</a></li></ul></li><li><span class="tocitem">Carriers</span><ul><li><a class="tocitem" href="../../carrier/simple/">SimpleCarrier</a></li><li><a class="tocitem" href="../../carrier/mango/">MangoCarrier</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../energy_dispatch/">Energy Dispatch (ADMM)</a></li><li class="is-active"><a class="tocitem" href>Schedule Coordination (COHDA)</a><ul class="internal"><li><a class="tocitem" href="#Problem-Statement"><span>Problem Statement</span></a></li><li><a class="tocitem" href="#Step-1-—-Define-the-Participants"><span>Step 1 — Define the Participants</span></a></li><li><a class="tocitem" href="#Step-2-—-Create-the-Start-Message"><span>Step 2 — Create the Start Message</span></a></li><li><a class="tocitem" href="#Step-3-—-Run-the-Distributed-Optimization"><span>Step 3 — Run the Distributed Optimization</span></a></li><li><a class="tocitem" href="#Step-4-—-Inspect-the-Result"><span>Step 4 — Inspect the Result</span></a></li><li><a class="tocitem" href="#Complete-Script"><span>Complete Script</span></a></li><li><a class="tocitem" href="#Using-SimpleCarrier-Directly"><span>Using SimpleCarrier Directly</span></a></li><li><a class="tocitem" href="#Extending-with-Custom-Performance"><span>Extending with Custom Performance</span></a></li><li><a class="tocitem" href="#Next-Steps"><span>Next Steps</span></a></li></ul></li></ul></li><li><span class="tocitem">How-To Guides</span><ul><li><a class="tocitem" href="../../howtos/custom_algorithm/">Custom Algorithm</a></li><li><a class="tocitem" href="../../howtos/custom_carrier/">Custom Carrier</a></li></ul></li><li><a class="tocitem" href="../../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Schedule Coordination (COHDA)</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Schedule Coordination (COHDA)</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Digitalized-Energy-Systems/DistributedResourceOptimization.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Tutorial:-Schedule-Coordination-with-COHDA"><a class="docs-heading-anchor" href="#Tutorial:-Schedule-Coordination-with-COHDA">Tutorial: Schedule Coordination with COHDA</a><a id="Tutorial:-Schedule-Coordination-with-COHDA-1"></a><a class="docs-heading-anchor-permalink" href="#Tutorial:-Schedule-Coordination-with-COHDA" title="Permalink"></a></h1><p>This tutorial shows how to use COHDA to coordinate a group of participants that each select a power schedule from a menu of options, with the goal of matching a target aggregate profile.</p><h2 id="Problem-Statement"><a class="docs-heading-anchor" href="#Problem-Statement">Problem Statement</a><a id="Problem-Statement-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-Statement" title="Permalink"></a></h2><p>Four distributed energy units (e.g., controllable loads) participate in a demand-response event. The grid operator asks for an aggregate power profile of <code>[3.0, 2.0, 1.0]</code> kW over three time steps.</p><p>Each unit can only operate in one of several predefined modes (schedules). The task is to find a combination — one schedule per unit — whose sum is as close as possible to the target.</p><h2 id="Step-1-—-Define-the-Participants"><a class="docs-heading-anchor" href="#Step-1-—-Define-the-Participants">Step 1 — Define the Participants</a><a id="Step-1-—-Define-the-Participants-1"></a><a class="docs-heading-anchor-permalink" href="#Step-1-—-Define-the-Participants" title="Permalink"></a></h2><p>Each participant is created with <a href="tutorials/@ref"><code>create_cohda_participant</code></a>. Arguments:</p><ul><li><code>id</code> — unique integer identifier</li><li><code>schedules</code> — vector of candidate schedules (each a <code>Vector{Float64}</code> of the same length as the target)</li></ul><pre><code class="language-julia hljs">using DistributedResourceOptimization
+
+# Unit A: can be OFF, run at half power, or run at full power
+schedules_A = [
+    [0.0, 0.0, 0.0],   # OFF
+    [1.0, 0.5, 0.0],   # half power
+    [2.0, 1.0, 0.5],   # full power
+]
+
+# Unit B: similar options but different profile shapes
+schedules_B = [
+    [0.0, 0.0, 0.0],
+    [0.5, 1.0, 0.5],
+    [1.0, 1.0, 0.5],
+]
+
+unit_A1 = create_cohda_participant(1, schedules_A)
+unit_A2 = create_cohda_participant(2, schedules_A)
+unit_B1 = create_cohda_participant(3, schedules_B)
+unit_B2 = create_cohda_participant(4, schedules_B)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">COHDAAlgorithmData(4, 0, WorkingMemory(nothing, SystemConfig(Dict{Int64, ScheduleSelection}()), nothing, Dict{String, Any}()), DistributedResourceOptimization.cohda_default_performance, DistributedResourceOptimization.DefaultLocalDecider(DistributedResourceOptimization.var&quot;#9#10&quot;{Vector{Vector{Float64}}}([[0.0, 0.0, 0.0], [0.5, 1.0, 0.5], [1.0, 1.0, 0.5]]), DistributedResourceOptimization.var&quot;#5#7&quot;()))</code></pre><h2 id="Step-2-—-Create-the-Start-Message"><a class="docs-heading-anchor" href="#Step-2-—-Create-the-Start-Message">Step 2 — Create the Start Message</a><a id="Step-2-—-Create-the-Start-Message-1"></a><a class="docs-heading-anchor-permalink" href="#Step-2-—-Create-the-Start-Message" title="Permalink"></a></h2><p>The start message carries the target profile that all participants try to match collectively:</p><pre><code class="language-julia hljs">target    = [3.0, 2.0, 1.0]
+start_msg = create_cohda_start_message(target)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">WorkingMemory(TargetParams([3.0, 2.0, 1.0], [1.0, 1.0, 1.0]), SystemConfig(Dict{Int64, ScheduleSelection}()), nothing, Dict{String, Any}())</code></pre><h2 id="Step-3-—-Run-the-Distributed-Optimization"><a class="docs-heading-anchor" href="#Step-3-—-Run-the-Distributed-Optimization">Step 3 — Run the Distributed Optimization</a><a id="Step-3-—-Run-the-Distributed-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Step-3-—-Run-the-Distributed-Optimization" title="Permalink"></a></h2><pre><code class="language-julia hljs">wait(start_distributed_optimization(
+    [unit_A1, unit_A2, unit_B1, unit_B2],
+    start_msg,
+))</code></pre><p><code>start_distributed_optimization</code> uses a <code>SimpleCarrier</code> internally. The call returns a task; <code>wait</code> blocks until the algorithm converges.</p><h2 id="Step-4-—-Inspect-the-Result"><a class="docs-heading-anchor" href="#Step-4-—-Inspect-the-Result">Step 4 — Inspect the Result</a><a id="Step-4-—-Inspect-the-Result-1"></a><a class="docs-heading-anchor-permalink" href="#Step-4-—-Inspect-the-Result" title="Permalink"></a></h2><p>After convergence, the selected schedule for each participant is stored in its <code>WorkingMemory</code>. You can access it via the algorithm&#39;s internal state:</p><pre><code class="language-julia hljs"># The memory field holds the best found system configuration
+wm = unit_A1.memory
+
+# The solution candidate holds the selected schedules as a Matrix (rows = participants)
+println(&quot;Best performance: &quot;, wm.solution_candidate.perf)
+
+# Extract the aggregate (sum over participants) of the chosen schedules
+aggregate = vec(sum(wm.solution_candidate.schedules, dims=1))
+println(&quot;Aggregate schedule: &quot;, aggregate)
+println(&quot;Target:             &quot;, target)
+println(&quot;L1 deviation:       &quot;, sum(abs.(aggregate .- target)))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Best performance: -1.0
+Aggregate schedule: [3.0, 1.5, 0.5]
+Target:             [3.0, 2.0, 1.0]
+L1 deviation:       1.0</code></pre><h2 id="Complete-Script"><a class="docs-heading-anchor" href="#Complete-Script">Complete Script</a><a id="Complete-Script-1"></a><a class="docs-heading-anchor-permalink" href="#Complete-Script" title="Permalink"></a></h2><pre><code class="language-julia hljs">using DistributedResourceOptimization
+
+# Schedule menus
+schedules_A = [[0.0, 0.0, 0.0], [1.0, 0.5, 0.0], [2.0, 1.0, 0.5]]
+schedules_B = [[0.0, 0.0, 0.0], [0.5, 1.0, 0.5], [1.0, 1.0, 0.5]]
+
+# Participants
+participants = [
+    create_cohda_participant(1, schedules_A),
+    create_cohda_participant(2, schedules_A),
+    create_cohda_participant(3, schedules_B),
+    create_cohda_participant(4, schedules_B),
+]
+
+# Target and start
+target    = [3.0, 2.0, 1.0]
+start_msg = create_cohda_start_message(target)
+
+# Solve
+wait(start_distributed_optimization(participants, start_msg))
+
+# Report
+wm        = participants[1].memory
+aggregate = vec(sum(wm.solution_candidate.schedules, dims=1))
+println(&quot;Aggregate schedule: &quot;, round.(aggregate; digits=3))
+println(&quot;Target:             &quot;, target)
+println(&quot;L1 deviation:       &quot;, round(sum(abs.(aggregate .- target)); digits=4))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Aggregate schedule: [3.0, 1.5, 0.5]
+Target:             [3.0, 2.0, 1.0]
+L1 deviation:       1.0</code></pre><h2 id="Using-SimpleCarrier-Directly"><a class="docs-heading-anchor" href="#Using-SimpleCarrier-Directly">Using SimpleCarrier Directly</a><a id="Using-SimpleCarrier-Directly-1"></a><a class="docs-heading-anchor-permalink" href="#Using-SimpleCarrier-Directly" title="Permalink"></a></h2><p>If you need more control — for example, to inspect intermediate messages or integrate with a larger simulation — use <code>SimpleCarrier</code> explicitly:</p><pre><code class="language-julia hljs">using DistributedResourceOptimization
+
+schedules_A = [[0.0, 0.0, 0.0], [1.0, 0.5, 0.0], [2.0, 1.0, 0.5]]
+
+container = ActorContainer()
+carrier1  = SimpleCarrier(container, create_cohda_participant(1, schedules_A))
+carrier2  = SimpleCarrier(container, create_cohda_participant(2, schedules_A))
+
+start_msg = create_cohda_start_message([2.0, 1.0, 0.5])
+
+# Send start message from carrier1 to carrier2; returns a task
+task = send_to_other(carrier1, start_msg, cid(carrier2))
+wait(task)</code></pre><h2 id="Extending-with-Custom-Performance"><a class="docs-heading-anchor" href="#Extending-with-Custom-Performance">Extending with Custom Performance</a><a id="Extending-with-Custom-Performance-1"></a><a class="docs-heading-anchor-permalink" href="#Extending-with-Custom-Performance" title="Permalink"></a></h2><p>By default COHDA uses a weighted L1 distance. Supply a custom performance function to <a href="tutorials/@ref"><code>create_cohda_participant</code></a> to optimise a different objective. The function receives a <code>Matrix{Float64}</code> (rows = participants, columns = time steps) and a <code>TargetParams</code> struct:</p><pre><code class="language-julia hljs">using DistributedResourceOptimization
+
+schedules_A = [[0.0, 0.0, 0.0], [1.0, 0.5, 0.0], [2.0, 1.0, 0.5]]
+
+# Minimise L2 (Euclidean) distance instead of the default weighted L1
+my_perf = (cluster_schedule, target_params) -&gt;
+    -sqrt(sum((target_params.schedule .- vec(sum(cluster_schedule, dims=1))) .^ 2))
+
+unit = create_cohda_participant(1, (_) -&gt; schedules_A, my_perf)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">COHDAAlgorithmData(1, 0, WorkingMemory(nothing, SystemConfig(Dict{Int64, ScheduleSelection}()), nothing, Dict{String, Any}()), Main.var&quot;Main&quot;.var&quot;#1#2&quot;(), DistributedResourceOptimization.DefaultLocalDecider(Main.var&quot;Main&quot;.var&quot;#3#4&quot;(), DistributedResourceOptimization.var&quot;#5#7&quot;()))</code></pre><div class="admonition is-info"><header class="admonition-header">Heuristic Quality</header><div class="admonition-body"><p>COHDA is a heuristic and may not find the global optimum, especially with many participants or a large schedule menu. In practice it converges quickly to near-optimal solutions on problems of realistic size (tens to hundreds of participants).</p></div></div><h2 id="Next-Steps"><a class="docs-heading-anchor" href="#Next-Steps">Next Steps</a><a id="Next-Steps-1"></a><a class="docs-heading-anchor-permalink" href="#Next-Steps" title="Permalink"></a></h2><ul><li>See <a href="../../algorithms/cohda/">COHDA algorithm details</a> for the mathematical background</li><li>Try the <a href="../energy_dispatch/">Energy Dispatch Tutorial</a> for the continuous ADMM variant</li><li>See <a href="../../howtos/custom_algorithm/">How To: Implement a Custom Algorithm</a> to add your own heuristic</li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../energy_dispatch/">« Energy Dispatch (ADMM)</a><a class="docs-footer-nextpage" href="../../howtos/custom_algorithm/">Custom Algorithm »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Thursday 19 February 2026 19:11">Thursday 19 February 2026</span>. Using Julia version 1.9.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
