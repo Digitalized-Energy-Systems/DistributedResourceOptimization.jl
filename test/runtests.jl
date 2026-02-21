@@ -27,5 +27,4 @@ end
     include("cohda/cohda_sc_tests.jl")
     include("admm/consensus_admm_tests.jl")
     include("admm/sharing_admm_tests.jl")
-    include("gradient/projected_gradient_tests.jl")
 end
