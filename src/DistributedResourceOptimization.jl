@@ -15,6 +15,8 @@ include("algorithm/admm/sharing_admm.jl")
 include("algorithm/consensus/averaging.jl")
 include("algorithm/consensus/economic_dispatch.jl")
 
+include("algorithm/gradient/projected_gradient.jl")
+
 include("carrier/mango.jl")
 include("carrier/simple.jl")
 

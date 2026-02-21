@@ -15,6 +15,7 @@ with_logger(logger) do
                 "ADMM"=>"algorithms/admm.md",
                 "COHDA"=>"algorithms/cohda.md",
                 "Averaging Consensus"=>"algorithms/consensus.md",
+                "Projected-Gradient (P2P)"=>"algorithms/projected_gradient.md",
             ],
             "Carriers" => [
                 "SimpleCarrier"=>"carrier/simple.md",
