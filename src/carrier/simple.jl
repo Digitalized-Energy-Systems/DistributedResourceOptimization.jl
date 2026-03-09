@@ -6,14 +6,16 @@ using UUIDs
 abstract type AbstractSimpleCarrier <: Carrier end
 
 """
-    ActorContainer  
+    ActorContainer
 
     A container to manage multiple `SimpleCarrier`.
 """
-struct ActorContainer
+mutable struct ActorContainer
     actors::Vector{AbstractSimpleCarrier}
+    active_tasks::Threads.Atomic{Int}
+    done_event::Base.Event
     function ActorContainer()
-        return new(Vector{AbstractSimpleCarrier}())
+        return new(Vector{AbstractSimpleCarrier}(), Threads.Atomic{Int}(0), Base.Event())
     end
 end
 
@@ -65,8 +67,15 @@ function send_to_other(carrier::SimpleCarrier, content::Any, receiver::Real; met
     other_carrier::Carrier = carrier.container.actors[receiver]
     main_meta = Dict(:sender => carrier.aid, :message_id => uuid4())
     union_meta = merge(main_meta, meta) # important: meta can override main_meta entries
+    Threads.atomic_add!(carrier.container.active_tasks, 1)
     return @spawnlog begin
-        _dispatch_to(other_carrier, content, union_meta)
+        try
+            _dispatch_to(other_carrier, content, union_meta)
+        finally
+            if Threads.atomic_sub!(carrier.container.active_tasks, 1) == 1
+                notify(carrier.container.done_event)
+            end
+        end
     end
 end
 
@@ -113,7 +122,8 @@ Return a waitable object that can be used to monitor the progress of the optimiz
 function start_distributed_optimization(actors::Vector{<:DistributedAlgorithm}, start_message::Any)
     actor_container = ActorContainer()
     carriers = [SimpleCarrier(actor_container, actor) for actor in actors]
-    return send_to_other(carriers[1], start_message, cid(carriers[2]))
+    send_to_other(carriers[1], start_message, cid(carriers[2]))
+    return Threads.@spawn wait(actor_container.done_event)
 end
 
 """

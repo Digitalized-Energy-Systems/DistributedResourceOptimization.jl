@@ -10,7 +10,8 @@ using Test
 
     initial_message = create_cohda_start_message([1.2, 2, 3])
 
-    wait(send_to_other(actor_one, initial_message, cid(actor_two)))
+    send_to_other(actor_one, initial_message, cid(actor_two))
+    wait(container.done_event)
 
     @test actor_one.actor.memory.solution_candidate.perf < 0
 end
@@ -23,6 +24,6 @@ end
     initial_message = create_cohda_start_message([1.2, 2, 3])
 
     wait(start_distributed_optimization([actor_one, actor_two], initial_message))
-
+    @test !isnothing(actor_one.memory.solution_candidate.perf)
     @test actor_one.memory.solution_candidate.perf < 0
 end
