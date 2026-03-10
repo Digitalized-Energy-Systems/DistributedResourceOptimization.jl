@@ -64,7 +64,7 @@ struct MyActor <: ConsensusActor
     β::Float64   # gradient step size
 end
 
-function gradient_term(actor::MyActor, λ::Vector{<:Real}, ::Any)
+function gradient_term(actor::MyActor, λ::Vector{<:Real}, data::Any)
     return actor.β .* (actor.target .- λ)
 end
 ```

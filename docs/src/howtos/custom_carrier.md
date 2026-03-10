@@ -12,22 +12,22 @@ All carriers extend `Carrier` and implement six functions:
 abstract type Carrier end
 
 # Send a message to another participant (fire-and-forget)
-send_to_other(::Carrier, content::Any, receiver::Any)
+send_to_other(carrier::Carrier, content_data::Any, receiver::Any)
 
 # Reply to the sender of an incoming message
-reply_to_other(::Carrier, content::Any, meta::Any)
+reply_to_other(carrier::Carrier, content_data::Any, meta::Any)
 
 # Send a message and return an awaitable handle
-send_awaitable(::Carrier, content::Any, receiver::Any)
+send_awaitable(carrier::Carrier, content_data::Any, receiver::Any)
 
 # Block until an awaitable handle completes; return its value
-Base.wait(::Carrier, waitable::Any)
+Base.wait(carrier::Carrier, waitable::Any)
 
 # Schedule a zero-argument function after `delay_s` seconds
-schedule_using(::Carrier, f::Function, delay_s::Float64)
+schedule_using(carrier::Carrier, to_be_scheduled::Function, delay_s::Float64)
 
 # Return IDs of all other participants (excluding self)
-others(::Carrier, self_id::String)
+others(carrier::Carrier, participant_id::String)
 ```
 
 You do not need to implement `get_address` unless your carrier is used with parts of the
@@ -53,20 +53,20 @@ end
 Implement each required function by delegating to the inner carrier:
 
 ```julia
-function send_to_other(c::LoggingCarrier, content::Any, receiver::Any)
-    @info "[LoggingCarrier] send → $receiver: $(typeof(content))"
-    send_to_other(c.inner, content, receiver)
+function send_to_other(c::LoggingCarrier, content_data::Any, receiver::Any)
+    @info "[LoggingCarrier] send → $receiver: $(typeof(content_data))"
+    send_to_other(c.inner, content_data, receiver)
 end
 
-function reply_to_other(c::LoggingCarrier, content::Any, meta::Any)
+function reply_to_other(c::LoggingCarrier, content_data::Any, meta::Any)
     sender = get(meta, :sender, "?")
-    @info "[LoggingCarrier] reply → $sender: $(typeof(content))"
-    reply_to_other(c.inner, content, meta)
+    @info "[LoggingCarrier] reply → $sender: $(typeof(content_data))"
+    reply_to_other(c.inner, content_data, meta)
 end
 
-function send_awaitable(c::LoggingCarrier, content::Any, receiver::Any)
-    @info "[LoggingCarrier] send_awaitable → $receiver: $(typeof(content))"
-    send_awaitable(c.inner, content, receiver)
+function send_awaitable(c::LoggingCarrier, content_data::Any, receiver::Any)
+    @info "[LoggingCarrier] send_awaitable → $receiver: $(typeof(content_data))"
+    send_awaitable(c.inner, content_data, receiver)
 end
 
 function Base.wait(c::LoggingCarrier, waitable::Any)
@@ -123,11 +123,11 @@ these principles:
    block on. The simplest implementation uses `EventWithValue`:
 
    ```julia
-   function send_awaitable(c::MyCarrier, content::Any, receiver::Any)
+   function send_awaitable(c::MyCarrier, content_data::Any, receiver::Any)
        event = EventWithValue(Base.Event(), nothing)
        # store event keyed by a message ID; resolve it when the reply arrives
        c.pending[my_id] = event
-       _dispatch_message(c, content, receiver, my_id)
+       _dispatch_message(c, content_data, receiver, my_id)
        return event
    end
 

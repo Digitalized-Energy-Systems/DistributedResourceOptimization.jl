@@ -13,10 +13,10 @@ All distributed algorithms extend `DistributedAlgorithm` and implement
 abstract type DistributedAlgorithm end
 
 function on_exchange_message(
-    ::DistributedAlgorithm,
-    ::Carrier,
-    ::Any,   # message_data
-    ::Any,   # meta
+    algorithm::DistributedAlgorithm,
+    carrier::Carrier,
+    message_data::Any,
+    meta::Any,
 )
     # Your logic here
 end
@@ -97,10 +97,10 @@ subtype alongside your `DistributedAlgorithm`:
 abstract type Coordinator end
 
 function start_optimization(
-    ::Coordinator,
-    ::Carrier,
-    ::Any,   # message_data
-    ::Any,   # meta
+    coordinator::Coordinator,
+    carrier::Carrier,
+    message_data::Any,
+    meta::Any,
 )
     # Kick off the coordinated optimization
 end

@@ -38,42 +38,42 @@ end
     finish_callback::Function
 end
 
-function on_exchange_message(algorithm_data::AveragingConsensusAlgorithm, carrier::Carrier, message::AveragingConsensusMessage, meta::Any)
-    #@info "Doing something" algorithm_data.first_message message.k algorithm_data.k
-    if message.k >= algorithm_data.max_iter
-        if algorithm_data.first_message 
+function on_exchange_message(algorithm::AveragingConsensusAlgorithm, carrier::Carrier, message_data::AveragingConsensusMessage, meta::Any)
+    #@info "Doing something" algorithm.first_message message_data.k algorithm.k
+    if message_data.k >= algorithm.max_iter
+        if algorithm.first_message
             # negotiation is over, only new with k=0 is expected
             return
         end
         # finish if iteration count is reached, reset all state data
-        algorithm_data.finish_callback(algorithm_data, carrier)
-        algorithm_data.first_message = true
-        empty!(algorithm_data.message_queue)
+        algorithm.finish_callback(algorithm, carrier)
+        algorithm.first_message = true
+        empty!(algorithm.message_queue)
         return
     end
-    
-    if algorithm_data.first_message || message.initial
-        algorithm_data.first_message = false
-        algorithm_data.k = 0
-        algorithm_data.λ = ones(length(message.λ)) .* algorithm_data.initial_λ
+
+    if algorithm.first_message || message_data.initial
+        algorithm.first_message = false
+        algorithm.k = 0
+        algorithm.λ = ones(length(message_data.λ)) .* algorithm.initial_λ
 
         for addr in others(carrier, "")
-            send_to_other(carrier, AveragingConsensusMessage(algorithm_data.λ, 0, message.data), addr)
+            send_to_other(carrier, AveragingConsensusMessage(algorithm.λ, 0, message_data.data), addr)
         end
     end
-    queue = get!(algorithm_data.message_queue, message.k, [])
-    
-    push!(queue, message)
-    
-    if length(queue) == length(others(carrier, "")) || algorithm_data.k < message.k
-        avgλ = sum(m.λ for m in queue) ./ length(queue)
-        algorithm_data.λ .+= algorithm_data.α .* (avgλ .- algorithm_data.λ) .+ gradient_term(algorithm_data.actor, algorithm_data.λ, message.data)
-        algorithm_data.k = message.k + 1
+    queue = get!(algorithm.message_queue, message_data.k, [])
 
-        delete!(algorithm_data.message_queue, message.k)
+    push!(queue, message_data)
+
+    if length(queue) == length(others(carrier, "")) || algorithm.k < message_data.k
+        avgλ = sum(m.λ for m in queue) ./ length(queue)
+        algorithm.λ .+= algorithm.α .* (avgλ .- algorithm.λ) .+ gradient_term(algorithm.actor, algorithm.λ, message_data.data)
+        algorithm.k = message_data.k + 1
+
+        delete!(algorithm.message_queue, message_data.k)
 
         for addr in others(carrier, "")
-            send_to_other(carrier, AveragingConsensusMessage(algorithm_data.λ, algorithm_data.k, message.data), addr)
+            send_to_other(carrier, AveragingConsensusMessage(algorithm.λ, algorithm.k, message_data.data), addr)
         end
     end
 end

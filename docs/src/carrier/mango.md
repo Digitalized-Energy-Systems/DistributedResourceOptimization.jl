@@ -107,7 +107,7 @@ using Mango, DistributedResourceOptimization
     results::Vector{Any}
 end
 
-@handle_message function collect(agent::ResultCollector, msg::OptimizationFinishedMessage, ::Any)
+@handle_message function collect(agent::ResultCollector, msg::OptimizationFinishedMessage, meta::Any)
     push!(agent.results, msg.result)
 end
 ```

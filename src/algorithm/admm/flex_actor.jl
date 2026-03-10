@@ -108,8 +108,8 @@ function _local_update(actor::ADMMFlexActor, v::Vector{Float64}, ρ::Float64)
     return value.(x)
 end
 
-function on_exchange_message(actor::ADMMFlexActor, carrier::Carrier, message_data::ADMMMessage, meta::Any)
-    actor.x = _local_update(actor, message_data.v, message_data.ρ)
+function on_exchange_message(algorithm::ADMMFlexActor, carrier::Carrier, message_data::ADMMMessage, meta::Any)
+    algorithm.x = _local_update(algorithm, message_data.v, message_data.ρ)
 
-    reply_to_other(carrier, ADMMAnswer(actor.x), meta)
+    reply_to_other(carrier, ADMMAnswer(algorithm.x), meta)
 end

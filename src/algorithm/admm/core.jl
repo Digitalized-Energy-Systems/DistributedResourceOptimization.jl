@@ -109,7 +109,7 @@ function _start_coordinator(admm::ADMMGenericCoordinator, carrier::Carrier, inpu
     return x, z, u
 end
 
-function start_optimization(coordinator::ADMMGenericCoordinator, carrier::Carrier, start_data::ADMMStart, meta::Any)
-    x,_,_ = _start_coordinator(coordinator, carrier, start_data.data, start_data.solution_length)
+function start_optimization(coordinator::ADMMGenericCoordinator, carrier::Carrier, message_data::ADMMStart, meta::Any)
+    x,_,_ = _start_coordinator(coordinator, carrier, message_data.data, message_data.solution_length)
     return x
 end

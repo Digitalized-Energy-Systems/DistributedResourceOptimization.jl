@@ -63,14 +63,14 @@ function _dispatch_to(carrier, content, meta)
     end
 end
 
-function send_to_other(carrier::SimpleCarrier, content::Any, receiver::Real; meta::Dict{Symbol,Any}=Dict{Symbol,Any}())
+function send_to_other(carrier::SimpleCarrier, content_data::Any, receiver::Real; meta::Dict{Symbol,Any}=Dict{Symbol,Any}())
     other_carrier::Carrier = carrier.container.actors[receiver]
     main_meta = Dict(:sender => carrier.aid, :message_id => uuid4())
     union_meta = merge(main_meta, meta) # important: meta can override main_meta entries
     Threads.atomic_add!(carrier.container.active_tasks, 1)
     return @spawnlog begin
         try
-            _dispatch_to(other_carrier, content, union_meta)
+            _dispatch_to(other_carrier, content_data, union_meta)
         finally
             if Threads.atomic_sub!(carrier.container.active_tasks, 1) == 1
                 notify(carrier.container.done_event)
@@ -83,17 +83,17 @@ function reply_to_other(carrier::SimpleCarrier, content_data::Any, meta)
     return send_to_other(carrier, content_data, meta[:sender], meta=merge(meta, Dict(:reply => true)))
 end
 
-function send_awaitable(carrier::SimpleCarrier, content::Any, receiver::Real; meta::Dict{Symbol,Any}=Dict{Symbol,Any}())
+function send_awaitable(carrier::SimpleCarrier, content_data::Any, receiver::Real; meta::Dict{Symbol,Any}=Dict{Symbol,Any}())
     other_carrier::Carrier = carrier.container.actors[receiver]
     main_meta = Dict(:sender => carrier.aid, :message_id => uuid4())
     union_meta = merge(main_meta, meta) # important: meta can override main_meta entries
     event = EventWithValue(Base.Event(), nothing)
-    carrier.uuid_to_handler[union_meta[:message_id]] = function(other_carrier::Carrier, content::Any, union_meta::Dict{Symbol,Any})
-        event.value = content
+    carrier.uuid_to_handler[union_meta[:message_id]] = function(other_carrier::Carrier, content_data::Any, union_meta::Dict{Symbol,Any})
+        event.value = content_data
         notify(event.event)
     end
     @spawnlog begin
-        _dispatch_to(other_carrier, content, union_meta)
+        _dispatch_to(other_carrier, content_data, union_meta)
     end
     return event
 end

@@ -112,8 +112,8 @@ function Base.wait(carrier::MangoCarrier, waitable::Any)
     wait(waitable)
 end
 
-function send_to_other(carrier::MangoCarrier, content::Any, receiver::AgentAddress)
-    return send_message(carrier.parent, content, receiver, optimization_message=true)
+function send_to_other(carrier::MangoCarrier, content_data::Any, receiver::AgentAddress)
+    return send_message(carrier.parent, content_data, receiver, optimization_message=true)
 end
 
 function Base.wait(carrier::MangoCarrier, event::EventWithValue)
@@ -121,9 +121,9 @@ function Base.wait(carrier::MangoCarrier, event::EventWithValue)
     return event.value
 end
 
-function send_awaitable(carrier::MangoCarrier, content::Any, receiver::AgentAddress)
+function send_awaitable(carrier::MangoCarrier, content_data::Any, receiver::AgentAddress)
     event = EventWithValue(Base.Event(), nothing)
-    send_and_handle_answer(carrier.parent, content, receiver, optimization_message=true) do _, answer,_
+    send_and_handle_answer(carrier.parent, content_data, receiver, optimization_message=true) do _, answer,_
         event.value = answer
         notify(carrier.parent.context.agent.scheduler, event.event)
     end
